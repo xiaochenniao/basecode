@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -25,7 +26,6 @@
  * @version    1.8.0, 2014-03-02
  */
 
-
 /**
  * PHPExcel_Comment
  *
@@ -33,8 +33,8 @@
  * @package    PHPExcel
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Comment implements PHPExcel_IComparable
-{
+class PHPExcel_Comment implements PHPExcel_IComparable {
+
     /**
      * Author
      *
@@ -103,13 +103,12 @@ class PHPExcel_Comment implements PHPExcel_IComparable
      *
      * @throws PHPExcel_Exception
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Initialise variables
-        $this->_author		= 'Author';
-        $this->_text		= new PHPExcel_RichText();
-        $this->_fillColor	= new PHPExcel_Style_Color('FFFFFFE1');
-        $this->_alignment	= PHPExcel_Style_Alignment::HORIZONTAL_GENERAL;
+        $this->_author = 'Author';
+        $this->_text = new PHPExcel_RichText();
+        $this->_fillColor = new PHPExcel_Style_Color('FFFFFFE1');
+        $this->_alignment = PHPExcel_Style_Alignment::HORIZONTAL_GENERAL;
     }
 
     /**
@@ -288,16 +287,16 @@ class PHPExcel_Comment implements PHPExcel_IComparable
      */
     public function getHashCode() {
         return md5(
-              $this->_author
-            . $this->_text->getHashCode()
-            . $this->_width
-            . $this->_height
-            . $this->_marginLeft
-            . $this->_marginTop
-            . ($this->_visible ? 1 : 0)
-            . $this->_fillColor->getHashCode()
-            . $this->_alignment
-            . __CLASS__
+                $this->_author
+                . $this->_text->getHashCode()
+                . $this->_width
+                . $this->_height
+                . $this->_marginLeft
+                . $this->_marginTop
+                . ($this->_visible ? 1 : 0)
+                . $this->_fillColor->getHashCode()
+                . $this->_alignment
+                . __CLASS__
         );
     }
 

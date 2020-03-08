@@ -871,3 +871,194 @@ class PHPExcel_Reader_Gnumeric extends PHPExcel_Reader_Abstract implements PHPEx
 	}
 
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        r->Diagonal->attributes());
+                                    $styleArray['borders']['diagonaldirection'] = PHPExcel_Style_Borders::DIAGONAL_BOTH;
+                                } elseif (isset($styleRegion->Style->StyleBorder->Diagonal)) {
+                                    $styleArray['borders']['diagonal'] = self::_parseBorderAttributes($styleRegion->Style->StyleBorder->Diagonal->attributes());
+                                    $styleArray['borders']['diagonaldirection'] = PHPExcel_Style_Borders::DIAGONAL_UP;
+                                } elseif (isset($styleRegion->Style->StyleBorder->{'Rev-Diagonal'})) {
+                                    $styleArray['borders']['diagonal'] = self::_parseBorderAttributes($styleRegion->Style->StyleBorder->{'Rev-Diagonal'}->attributes());
+                                    $styleArray['borders']['diagonaldirection'] = PHPExcel_Style_Borders::DIAGONAL_DOWN;
+                                }
+                            }
+                            if (isset($styleRegion->Style->HyperLink)) {
+                                //	TO DO
+                                $hyperlink = $styleRegion->Style->HyperLink->attributes();
+                            }
+                        }
+//						var_dump($styleArray);
+//						echo '<br />';
+                        $objPHPExcel->getActiveSheet()->getStyle($cellRange)->applyFromArray($styleArray);
+                    }
+                }
+            }
+
+            if ((!$this->_readDataOnly) && (isset($sheet->Cols))) {
+                //	Column Widths
+                $columnAttributes = $sheet->Cols->attributes();
+                $defaultWidth = $columnAttributes['DefaultSizePts'] / 5.4;
+                $c = 0;
+                foreach ($sheet->Cols->ColInfo as $columnOverride) {
+                    $columnAttributes = $columnOverride->attributes();
+                    $column = $columnAttributes['No'];
+                    $columnWidth = $columnAttributes['Unit'] / 5.4;
+                    $hidden = ((isset($columnAttributes['Hidden'])) && ($columnAttributes['Hidden'] == '1')) ? true : false;
+                    $columnCount = (isset($columnAttributes['Count'])) ? $columnAttributes['Count'] : 1;
+                    while ($c < $column) {
+                        $objPHPExcel->getActiveSheet()->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($c))->setWidth($defaultWidth);
+                        ++$c;
+                    }
+                    while (($c < ($column + $columnCount)) && ($c <= $maxCol)) {
+                        $objPHPExcel->getActiveSheet()->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($c))->setWidth($columnWidth);
+                        if ($hidden) {
+                            $objPHPExcel->getActiveSheet()->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($c))->setVisible(false);
+                        }
+                        ++$c;
+                    }
+                }
+                while ($c <= $maxCol) {
+                    $objPHPExcel->getActiveSheet()->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($c))->setWidth($defaultWidth);
+                    ++$c;
+                }
+            }
+
+            if ((!$this->_readDataOnly) && (isset($sheet->Rows))) {
+                //	Row Heights
+                $rowAttributes = $sheet->Rows->attributes();
+                $defaultHeight = $rowAttributes['DefaultSizePts'];
+                $r = 0;
+
+                foreach ($sheet->Rows->RowInfo as $rowOverride) {
+                    $rowAttributes = $rowOverride->attributes();
+                    $row = $rowAttributes['No'];
+                    $rowHeight = $rowAttributes['Unit'];
+                    $hidden = ((isset($rowAttributes['Hidden'])) && ($rowAttributes['Hidden'] == '1')) ? true : false;
+                    $rowCount = (isset($rowAttributes['Count'])) ? $rowAttributes['Count'] : 1;
+                    while ($r < $row) {
+                        ++$r;
+                        $objPHPExcel->getActiveSheet()->getRowDimension($r)->setRowHeight($defaultHeight);
+                    }
+                    while (($r < ($row + $rowCount)) && ($r < $maxRow)) {
+                        ++$r;
+                        $objPHPExcel->getActiveSheet()->getRowDimension($r)->setRowHeight($rowHeight);
+                        if ($hidden) {
+                            $objPHPExcel->getActiveSheet()->getRowDimension($r)->setVisible(false);
+                        }
+                    }
+                }
+                while ($r < $maxRow) {
+                    ++$r;
+                    $objPHPExcel->getActiveSheet()->getRowDimension($r)->setRowHeight($defaultHeight);
+                }
+            }
+
+            //	Handle Merged Cells in this worksheet
+            if (isset($sheet->MergedRegions)) {
+                foreach ($sheet->MergedRegions->Merge as $mergeCells) {
+                    if (strpos($mergeCells, ':') !== FALSE) {
+                        $objPHPExcel->getActiveSheet()->mergeCells($mergeCells);
+                    }
+                }
+            }
+
+            $worksheetID++;
+        }
+
+        //	Loop through definedNames (global named ranges)
+        if (isset($gnmXML->Names)) {
+            foreach ($gnmXML->Names->Name as $namedRange) {
+                $name = (string) $namedRange->name;
+                $range = (string) $namedRange->value;
+                if (stripos($range, '#REF!') !== false) {
+                    continue;
+                }
+
+                $range = explode('!', $range);
+                $range[0] = trim($range[0], "'");
+                ;
+                if ($worksheet = $objPHPExcel->getSheetByName($range[0])) {
+                    $extractedRange = str_replace('$', '', $range[1]);
+                    $objPHPExcel->addNamedRange(new PHPExcel_NamedRange($name, $worksheet, $extractedRange));
+                }
+            }
+        }
+
+
+        // Return
+        return $objPHPExcel;
+    }
+
+    private static function _parseBorderAttributes($borderAttributes) {
+        $styleArray = array();
+
+        if (isset($borderAttributes["Color"])) {
+            $RGB = self::_parseGnumericColour($borderAttributes["Color"]);
+            $styleArray['color']['rgb'] = $RGB;
+        }
+
+        switch ($borderAttributes["Style"]) {
+            case '0' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_NONE;
+                break;
+            case '1' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_THIN;
+                break;
+            case '2' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_MEDIUM;
+                break;
+            case '4' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_DASHED;
+                break;
+            case '5' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_THICK;
+                break;
+            case '6' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_DOUBLE;
+                break;
+            case '7' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_DOTTED;
+                break;
+            case '9' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_DASHDOT;
+                break;
+            case '10' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_MEDIUMDASHDOT;
+                break;
+            case '11' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_DASHDOTDOT;
+                break;
+            case '12' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_MEDIUMDASHDOTDOT;
+                break;
+            case '13' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_MEDIUMDASHDOTDOT;
+                break;
+            case '3' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_SLANTDASHDOT;
+                break;
+            case '8' :
+                $styleArray['style'] = PHPExcel_Style_Border::BORDER_MEDIUMDASHED;
+                break;
+        }
+        return $styleArray;
+    }
+
+    private function _parseRichText($is = '') {
+        $value = new PHPExcel_RichText();
+
+        $value->createText($is);
+
+        return $value;
+    }
+
+    private static function _parseGnumericColour($gnmColour) {
+        list($gnmR, $gnmG, $gnmB) = explode(':', $gnmColour);
+        $gnmR = substr(str_pad($gnmR, 4, '0', STR_PAD_RIGHT), 0, 2);
+        $gnmG = substr(str_pad($gnmG, 4, '0', STR_PAD_RIGHT), 0, 2);
+        $gnmB = substr(str_pad($gnmB, 4, '0', STR_PAD_RIGHT), 0, 2);
+        $RGB = $gnmR . $gnmG . $gnmB;
+//		echo 'Excel Colour: ',$RGB,'<br />';
+        return $RGB;
+    }
+
+}

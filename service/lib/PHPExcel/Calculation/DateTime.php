@@ -1473,3 +1473,201 @@ class PHPExcel_Calculation_DateTime {
 
 }	//	class PHPExcel_Calculation_DateTime
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (is_string($timeValue)) {
+                return PHPExcel_Calculation_Functions::VALUE();
+            }
+        }
+        // Execute function
+        if ($timeValue >= 1) {
+            $timeValue = fmod($timeValue, 1);
+        } elseif ($timeValue < 0.0) {
+            return PHPExcel_Calculation_Functions::NaN();
+        }
+        $timeValue = PHPExcel_Shared_Date::ExcelToPHP($timeValue);
+
+        return (int) gmdate('G', $timeValue);
+    }
+
+//	function HOUROFDAY()
+
+    /**
+     * MINUTEOFHOUR
+     *
+     * Returns the minutes of a time value.
+     * The minute is given as an integer, ranging from 0 to 59.
+     *
+     * Excel Function:
+     * 		MINUTE(timeValue)
+     *
+     * @param	mixed	$timeValue		Excel date serial value (float), PHP date timestamp (integer),
+     * 									PHP DateTime object, or a standard time string
+     * @return	int		Minute
+     */
+    public static function MINUTEOFHOUR($timeValue = 0) {
+        $timeValue = $timeTester = PHPExcel_Calculation_Functions::flattenSingleValue($timeValue);
+
+        if (!is_numeric($timeValue)) {
+            if (PHPExcel_Calculation_Functions::getCompatibilityMode() == PHPExcel_Calculation_Functions::COMPATIBILITY_GNUMERIC) {
+                $testVal = strtok($timeValue, '/-: ');
+                if (strlen($testVal) < strlen($timeValue)) {
+                    return PHPExcel_Calculation_Functions::VALUE();
+                }
+            }
+            $timeValue = self::_getTimeValue($timeValue);
+            if (is_string($timeValue)) {
+                return PHPExcel_Calculation_Functions::VALUE();
+            }
+        }
+        // Execute function
+        if ($timeValue >= 1) {
+            $timeValue = fmod($timeValue, 1);
+        } elseif ($timeValue < 0.0) {
+            return PHPExcel_Calculation_Functions::NaN();
+        }
+        $timeValue = PHPExcel_Shared_Date::ExcelToPHP($timeValue);
+
+        return (int) gmdate('i', $timeValue);
+    }
+
+//	function MINUTEOFHOUR()
+
+    /**
+     * SECONDOFMINUTE
+     *
+     * Returns the seconds of a time value.
+     * The second is given as an integer in the range 0 (zero) to 59.
+     *
+     * Excel Function:
+     * 		SECOND(timeValue)
+     *
+     * @param	mixed	$timeValue		Excel date serial value (float), PHP date timestamp (integer),
+     * 									PHP DateTime object, or a standard time string
+     * @return	int		Second
+     */
+    public static function SECONDOFMINUTE($timeValue = 0) {
+        $timeValue = PHPExcel_Calculation_Functions::flattenSingleValue($timeValue);
+
+        if (!is_numeric($timeValue)) {
+            if (PHPExcel_Calculation_Functions::getCompatibilityMode() == PHPExcel_Calculation_Functions::COMPATIBILITY_GNUMERIC) {
+                $testVal = strtok($timeValue, '/-: ');
+                if (strlen($testVal) < strlen($timeValue)) {
+                    return PHPExcel_Calculation_Functions::VALUE();
+                }
+            }
+            $timeValue = self::_getTimeValue($timeValue);
+            if (is_string($timeValue)) {
+                return PHPExcel_Calculation_Functions::VALUE();
+            }
+        }
+        // Execute function
+        if ($timeValue >= 1) {
+            $timeValue = fmod($timeValue, 1);
+        } elseif ($timeValue < 0.0) {
+            return PHPExcel_Calculation_Functions::NaN();
+        }
+        $timeValue = PHPExcel_Shared_Date::ExcelToPHP($timeValue);
+
+        return (int) gmdate('s', $timeValue);
+    }
+
+//	function SECONDOFMINUTE()
+
+    /**
+     * EDATE
+     *
+     * Returns the serial number that represents the date that is the indicated number of months
+     * before or after a specified date (the start_date).
+     * Use EDATE to calculate maturity dates or due dates that fall on the same day of the month
+     * as the date of issue.
+     *
+     * Excel Function:
+     * 		EDATE(dateValue,adjustmentMonths)
+     *
+     * @param	mixed	$dateValue			Excel date serial value (float), PHP date timestamp (integer),
+     * 										PHP DateTime object, or a standard date string
+     * @param	int		$adjustmentMonths	The number of months before or after start_date.
+     * 										A positive value for months yields a future date;
+     * 										a negative value yields a past date.
+     * @return	mixed	Excel date/time serial value, PHP date/time serial value or PHP date/time object,
+     * 						depending on the value of the ReturnDateType flag
+     */
+    public static function EDATE($dateValue = 1, $adjustmentMonths = 0) {
+        $dateValue = PHPExcel_Calculation_Functions::flattenSingleValue($dateValue);
+        $adjustmentMonths = PHPExcel_Calculation_Functions::flattenSingleValue($adjustmentMonths);
+
+        if (!is_numeric($adjustmentMonths)) {
+            return PHPExcel_Calculation_Functions::VALUE();
+        }
+        $adjustmentMonths = floor($adjustmentMonths);
+
+        if (is_string($dateValue = self::_getDateValue($dateValue))) {
+            return PHPExcel_Calculation_Functions::VALUE();
+        }
+
+        // Execute function
+        $PHPDateObject = self::_adjustDateByMonths($dateValue, $adjustmentMonths);
+
+        switch (PHPExcel_Calculation_Functions::getReturnDateType()) {
+            case PHPExcel_Calculation_Functions::RETURNDATE_EXCEL :
+                return (float) PHPExcel_Shared_Date::PHPToExcel($PHPDateObject);
+            case PHPExcel_Calculation_Functions::RETURNDATE_PHP_NUMERIC :
+                return (integer) PHPExcel_Shared_Date::ExcelToPHP(PHPExcel_Shared_Date::PHPToExcel($PHPDateObject));
+            case PHPExcel_Calculation_Functions::RETURNDATE_PHP_OBJECT :
+                return $PHPDateObject;
+        }
+    }
+
+//	function EDATE()
+
+    /**
+     * EOMONTH
+     *
+     * Returns the date value for the last day of the month that is the indicated number of months
+     * before or after start_date.
+     * Use EOMONTH to calculate maturity dates or due dates that fall on the last day of the month.
+     *
+     * Excel Function:
+     * 		EOMONTH(dateValue,adjustmentMonths)
+     *
+     * @param	mixed	$dateValue			Excel date serial value (float), PHP date timestamp (integer),
+     * 										PHP DateTime object, or a standard date string
+     * @param	int		$adjustmentMonths	The number of months before or after start_date.
+     * 										A positive value for months yields a future date;
+     * 										a negative value yields a past date.
+     * @return	mixed	Excel date/time serial value, PHP date/time serial value or PHP date/time object,
+     * 						depending on the value of the ReturnDateType flag
+     */
+    public static function EOMONTH($dateValue = 1, $adjustmentMonths = 0) {
+        $dateValue = PHPExcel_Calculation_Functions::flattenSingleValue($dateValue);
+        $adjustmentMonths = PHPExcel_Calculation_Functions::flattenSingleValue($adjustmentMonths);
+
+        if (!is_numeric($adjustmentMonths)) {
+            return PHPExcel_Calculation_Functions::VALUE();
+        }
+        $adjustmentMonths = floor($adjustmentMonths);
+
+        if (is_string($dateValue = self::_getDateValue($dateValue))) {
+            return PHPExcel_Calculation_Functions::VALUE();
+        }
+
+        // Execute function
+        $PHPDateObject = self::_adjustDateByMonths($dateValue, $adjustmentMonths + 1);
+        $adjustDays = (int) $PHPDateObject->format('d');
+        $adjustDaysString = '-' . $adjustDays . ' days';
+        $PHPDateObject->modify($adjustDaysString);
+
+        switch (PHPExcel_Calculation_Functions::getReturnDateType()) {
+            case PHPExcel_Calculation_Functions::RETURNDATE_EXCEL :
+                return (float) PHPExcel_Shared_Date::PHPToExcel($PHPDateObject);
+            case PHPExcel_Calculation_Functions::RETURNDATE_PHP_NUMERIC :
+                return (integer) PHPExcel_Shared_Date::ExcelToPHP(PHPExcel_Shared_Date::PHPToExcel($PHPDateObject));
+            case PHPExcel_Calculation_Functions::RETURNDATE_PHP_OBJECT :
+                return $PHPDateObject;
+        }
+    }
+
+//	function EOMONTH()
+}
+
+//	class PHPExcel_Calculation_DateTime
+

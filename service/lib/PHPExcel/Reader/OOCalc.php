@@ -705,3 +705,110 @@ class PHPExcel_Reader_OOCalc extends PHPExcel_Reader_Abstract implements PHPExce
 	}
 
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $formatting = PHPExcel_Style_NumberFormat::FORMAT_DATE_XLSX15;
+                                            }
+                                            break;
+                                        case 'time' :
+                                            $type = PHPExcel_Cell_DataType::TYPE_NUMERIC;
+                                            $dataValue = PHPExcel_Shared_Date::PHPToExcel(strtotime('01-01-1970 ' . implode(':', sscanf($cellDataOfficeAttributes['time-value'], 'PT%dH%dM%dS'))));
+                                            $formatting = PHPExcel_Style_NumberFormat::FORMAT_DATE_TIME4;
+                                            break;
+                                    }
+//									echo 'Data value is '.$dataValue.'<br />';
+//									if ($hyperlink !== NULL) {
+//										echo 'Hyperlink is '.$hyperlink.'<br />';
+//									}
+                                } else {
+                                    $type = PHPExcel_Cell_DataType::TYPE_NULL;
+                                    $dataValue = NULL;
+                                }
+
+                                if ($hasCalculatedValue) {
+                                    $type = PHPExcel_Cell_DataType::TYPE_FORMULA;
+//									echo 'Formula: ', $cellDataFormula, PHP_EOL;
+                                    $cellDataFormula = substr($cellDataFormula, strpos($cellDataFormula, ':=') + 1);
+                                    $temp = explode('"', $cellDataFormula);
+                                    $tKey = false;
+                                    foreach ($temp as &$value) {
+                                        //	Only replace in alternate array entries (i.e. non-quoted blocks)
+                                        if ($tKey = !$tKey) {
+                                            $value = preg_replace('/\[([^\.]+)\.([^\.]+):\.([^\.]+)\]/Ui', '$1!$2:$3', $value);    //  Cell range reference in another sheet
+                                            $value = preg_replace('/\[([^\.]+)\.([^\.]+)\]/Ui', '$1!$2', $value);       //  Cell reference in another sheet
+                                            $value = preg_replace('/\[\.([^\.]+):\.([^\.]+)\]/Ui', '$1:$2', $value);    //  Cell range reference
+                                            $value = preg_replace('/\[\.([^\.]+)\]/Ui', '$1', $value);                  //  Simple cell reference
+                                            $value = PHPExcel_Calculation::_translateSeparator(';', ',', $value, $inBraces);
+                                        }
+                                    }
+                                    unset($value);
+                                    //	Then rebuild the formula string
+                                    $cellDataFormula = implode('"', $temp);
+//									echo 'Adjusted Formula: ', $cellDataFormula, PHP_EOL;
+                                }
+
+                                $colRepeats = (isset($cellDataTableAttributes['number-columns-repeated'])) ?
+                                        $cellDataTableAttributes['number-columns-repeated'] : 1;
+                                if ($type !== NULL) {
+                                    for ($i = 0; $i < $colRepeats; ++$i) {
+                                        if ($i > 0) {
+                                            ++$columnID;
+                                        }
+                                        if ($type !== PHPExcel_Cell_DataType::TYPE_NULL) {
+                                            for ($rowAdjust = 0; $rowAdjust < $rowRepeats; ++$rowAdjust) {
+                                                $rID = $rowID + $rowAdjust;
+                                                $objPHPExcel->getActiveSheet()->getCell($columnID . $rID)->setValueExplicit((($hasCalculatedValue) ? $cellDataFormula : $dataValue), $type);
+                                                if ($hasCalculatedValue) {
+//													echo 'Forumla result is '.$dataValue.'<br />';
+                                                    $objPHPExcel->getActiveSheet()->getCell($columnID . $rID)->setCalculatedValue($dataValue);
+                                                }
+                                                if ($formatting !== NULL) {
+                                                    $objPHPExcel->getActiveSheet()->getStyle($columnID . $rID)->getNumberFormat()->setFormatCode($formatting);
+                                                } else {
+                                                    $objPHPExcel->getActiveSheet()->getStyle($columnID . $rID)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_GENERAL);
+                                                }
+                                                if ($hyperlink !== NULL) {
+                                                    $objPHPExcel->getActiveSheet()->getCell($columnID . $rID)->getHyperlink()->setUrl($hyperlink);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //	Merged cells
+                                if ((isset($cellDataTableAttributes['number-columns-spanned'])) || (isset($cellDataTableAttributes['number-rows-spanned']))) {
+                                    if (($type !== PHPExcel_Cell_DataType::TYPE_NULL) || (!$this->_readDataOnly)) {
+                                        $columnTo = $columnID;
+                                        if (isset($cellDataTableAttributes['number-columns-spanned'])) {
+                                            $columnTo = PHPExcel_Cell::stringFromColumnIndex(PHPExcel_Cell::columnIndexFromString($columnID) + $cellDataTableAttributes['number-columns-spanned'] - 2);
+                                        }
+                                        $rowTo = $rowID;
+                                        if (isset($cellDataTableAttributes['number-rows-spanned'])) {
+                                            $rowTo = $rowTo + $cellDataTableAttributes['number-rows-spanned'] - 1;
+                                        }
+                                        $cellRange = $columnID . $rowID . ':' . $columnTo . $rowTo;
+                                        $objPHPExcel->getActiveSheet()->mergeCells($cellRange);
+                                    }
+                                }
+
+                                ++$columnID;
+                            }
+                            $rowID += $rowRepeats;
+                            break;
+                    }
+                }
+                ++$worksheetID;
+            }
+        }
+
+        // Return
+        return $objPHPExcel;
+    }
+
+    private function _parseRichText($is = '') {
+        $value = new PHPExcel_RichText();
+
+        $value->createText($is);
+
+        return $value;
+    }
+
+}

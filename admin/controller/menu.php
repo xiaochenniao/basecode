@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 后台菜单配置
  */
-
 class menu_Controller extends Controller {
 
     function indexAction() {

@@ -913,9 +913,4 @@ static public $yy_action = array(
                 }
             } else {
                 $this->yy_accept();
-                $yymajor = self::YYNOCODE;
-            }
-        } while ($yymajor != self::YYNOCODE && $this->yyidx >= 0);
-    }
-}
-?>
+                $yymajor = self::YYNOC

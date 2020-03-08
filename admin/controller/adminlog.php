@@ -2,7 +2,7 @@
 
 /**
  * 管理日志
- * */
+ */
 class adminlog_Controller extends Controller {
 
     function init() {

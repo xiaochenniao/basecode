@@ -25,7 +25,24 @@ class except extends exception {
         return self::text($this);
     }
 
-    public static function handler(Exception $e) {
+    /**
+     * 参数说明
+     * 自 PHP 7 以来，大多数错误抛出 Error 异常，如果在用户回调里将 $ex 参数的类型明确约束为Exception， PHP 7 中由于异常类型的变化，将会产生问题，所以最好的兼容方案就是：移除 $ex 参数前的类型约束。
+     * //register exceptoin handler
+      set_exception_handler('handler');
+
+      // PHP 5 work only
+      function handler(Exception $e) { ... }
+
+      // PHP 7 work only
+      function handler(Throwable $e) { ... }
+
+      // PHP 5 and 7 compatible.
+      function handler($e) { ... }
+     * @param Exception $e
+     * @throws exception
+     */
+    public static function handler($e) {
         try {
             $type = get_class($e);
             $code = $e->getCode();
@@ -74,7 +91,7 @@ class except extends exception {
         }
     }
 
-    public static function text(Exception $e) {
+    public static function text($e) {
         return sprintf('%s [ %s ]: %s ~ %s [ %d ]', get_class($e), $e->getCode(), strip_tags($e->getMessage()), debug::path($e->getFile()), $e->getLine());
     }
 

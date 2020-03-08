@@ -879,3 +879,116 @@ class PHPExcel_Calculation_LookupRef {
  	}	//	function LOOKUP()
 
 }	//	class PHPExcel_Calculation_LookupRef
+                                                                                                                                                                                                                                                                                                                                                                                                  lookup_array);
+            $firstRow = array_pop($f);
+            if ((!is_array($lookup_array[$firstRow])) || ($index_number > count($lookup_array[$firstRow]))) {
+                return PHPExcel_Calculation_Functions::REF();
+            } else {
+                $columnKeys = array_keys($lookup_array[$firstRow]);
+                $firstkey = $f[0] - 1;
+                $returnColumn = $firstkey + $index_number;
+                $firstColumn = array_shift($f);
+            }
+        }
+
+        if (!$not_exact_match) {
+            $firstRowH = asort($lookup_array[$firstColumn]);
+        }
+
+        $rowNumber = $rowValue = False;
+        foreach ($lookup_array[$firstColumn] as $rowKey => $rowData) {
+            if ((is_numeric($lookup_value) && is_numeric($rowData) && ($rowData > $lookup_value)) ||
+                    (!is_numeric($lookup_value) && !is_numeric($rowData) && (strtolower($rowData) > strtolower($lookup_value)))) {
+                break;
+            }
+            $rowNumber = $rowKey;
+            $rowValue = $rowData;
+        }
+
+        if ($rowNumber !== false) {
+            if ((!$not_exact_match) && ($rowValue != $lookup_value)) {
+                //  if an exact match is required, we have what we need to return an appropriate response
+                return PHPExcel_Calculation_Functions::NA();
+            } else {
+                //  otherwise return the appropriate value
+                $result = $lookup_array[$returnColumn][$rowNumber];
+                return $result;
+            }
+        }
+
+        return PHPExcel_Calculation_Functions::NA();
+    }
+
+//  function HLOOKUP()
+
+    /**
+     * LOOKUP
+     * The LOOKUP function searches for value either from a one-row or one-column range or from an array.
+     * @param	lookup_value	The value that you want to match in lookup_array
+     * @param	lookup_vector	The range of cells being searched
+     * @param	result_vector	The column from which the matching value must be returned
+     * @return	mixed			The value of the found cell
+     */
+    public static function LOOKUP($lookup_value, $lookup_vector, $result_vector = null) {
+        $lookup_value = PHPExcel_Calculation_Functions::flattenSingleValue($lookup_value);
+
+        if (!is_array($lookup_vector)) {
+            return PHPExcel_Calculation_Functions::NA();
+        }
+        $lookupRows = count($lookup_vector);
+        $l = array_keys($lookup_vector);
+        $l = array_shift($l);
+        $lookupColumns = count($lookup_vector[$l]);
+        if ((($lookupRows == 1) && ($lookupColumns > 1)) || (($lookupRows == 2) && ($lookupColumns != 2))) {
+            $lookup_vector = self::TRANSPOSE($lookup_vector);
+            $lookupRows = count($lookup_vector);
+            $l = array_keys($lookup_vector);
+            $lookupColumns = count($lookup_vector[array_shift($l)]);
+        }
+
+        if (is_null($result_vector)) {
+            $result_vector = $lookup_vector;
+        }
+        $resultRows = count($result_vector);
+        $l = array_keys($result_vector);
+        $l = array_shift($l);
+        $resultColumns = count($result_vector[$l]);
+        if ((($resultRows == 1) && ($resultColumns > 1)) || (($resultRows == 2) && ($resultColumns != 2))) {
+            $result_vector = self::TRANSPOSE($result_vector);
+            $resultRows = count($result_vector);
+            $r = array_keys($result_vector);
+            $resultColumns = count($result_vector[array_shift($r)]);
+        }
+
+        if ($lookupRows == 2) {
+            $result_vector = array_pop($lookup_vector);
+            $lookup_vector = array_shift($lookup_vector);
+        }
+        if ($lookupColumns != 2) {
+            foreach ($lookup_vector as &$value) {
+                if (is_array($value)) {
+                    $k = array_keys($value);
+                    $key1 = $key2 = array_shift($k);
+                    $key2++;
+                    $dataValue1 = $value[$key1];
+                } else {
+                    $key1 = 0;
+                    $key2 = 1;
+                    $dataValue1 = $value;
+                }
+                $dataValue2 = array_shift($result_vector);
+                if (is_array($dataValue2)) {
+                    $dataValue2 = array_shift($dataValue2);
+                }
+                $value = array($key1 => $dataValue1, $key2 => $dataValue2);
+            }
+            unset($value);
+        }
+
+        return self::VLOOKUP($lookup_value, $lookup_vector, 2);
+    }
+
+//	function LOOKUP()
+}
+
+//	class PHPExcel_Calculation_LookupRef

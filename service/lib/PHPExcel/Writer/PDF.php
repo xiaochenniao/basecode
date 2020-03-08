@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  PHPExcel
  *
@@ -25,7 +26,6 @@
  *  @version     1.8.0, 2014-03-02
  */
 
-
 /**
  *  PHPExcel_Writer_PDF
  *
@@ -33,8 +33,7 @@
  *  @package     PHPExcel_Writer_PDF
  *  @copyright   Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Writer_PDF
-{
+class PHPExcel_Writer_PDF {
 
     /**
      * The wrapper for the requested PDF rendering engine
@@ -49,8 +48,7 @@ class PHPExcel_Writer_PDF
      *  @param  PHPExcel   $phpExcel         PHPExcel object
      *  @throws PHPExcel_Writer_Exception    when PDF library is not configured
      */
-    public function __construct(PHPExcel $phpExcel)
-    {
+    public function __construct(PHPExcel $phpExcel) {
         $pdfLibraryName = PHPExcel_Settings::getPdfRendererName();
         if (is_null($pdfLibraryName)) {
             throw new PHPExcel_Writer_Exception("PDF Rendering library has not been defined.");
@@ -70,7 +68,6 @@ class PHPExcel_Writer_PDF
         $this->_renderer = new $rendererName($phpExcel);
     }
 
-
     /**
      *  Magic method to handle direct calls to the configured PDF renderer wrapper class.
      *
@@ -78,8 +75,7 @@ class PHPExcel_Writer_PDF
      *  @param   mixed[]  $arguments   Array of arguments to pass to the renderer method
      *  @return  mixed    Returned data from the PDF renderer wrapper method
      */
-    public function __call($name, $arguments)
-    {
+    public function __call($name, $arguments) {
         if ($this->_renderer === NULL) {
             throw new PHPExcel_Writer_Exception("PDF Rendering library has not been defined.");
         }

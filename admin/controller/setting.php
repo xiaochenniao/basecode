@@ -3,7 +3,6 @@
 /**
  * 系统参数设置
  */
-
 class setting_Controller extends Controller {
 
     function indexAction() {

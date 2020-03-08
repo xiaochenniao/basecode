@@ -1448,3 +1448,97 @@ class PHPExcel_Writer_Excel5_Workbook extends PHPExcel_Writer_Excel5_BIFFwriter
 		$this->_escher = $pValue;
 	}
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       n minimum space needed
+                    //		here we must waste the space remaining and move to next record data block
+                    // 2. space remaining is greater than or equal to minimum space needed
+                    //		here we write as much as we can in the current block, then move to next record data block
+                    // 1. space remaining is less than minimum space needed
+                    if ($space_remaining < $min_space_needed) {
+                        // we close the block, store the block data
+                        $recordDatas[] = $recordData;
+
+                        // and start new record data block where we start writing the string
+                        $recordData = '';
+
+                        // 2. space remaining is greater than or equal to minimum space needed
+                    } else {
+                        // initialize effective remaining space, for Unicode strings this may need to be reduced by 1, see below
+                        $effective_space_remaining = $space_remaining;
+
+                        // for uncompressed strings, sometimes effective space remaining is reduced by 1
+                        if ($encoding == 1 && (strlen($string) - $space_remaining) % 2 == 1) {
+                            --$effective_space_remaining;
+                        }
+
+                        // one block fininshed, store the block data
+                        $recordData .= substr($string, 0, $effective_space_remaining);
+
+                        $string = substr($string, $effective_space_remaining); // for next cycle in while loop
+                        $recordDatas[] = $recordData;
+
+                        // start new record data block with the repeated option flags
+                        $recordData = pack('C', $encoding);
+                    }
+                }
+            }
+        }
+
+        // Store the last record data block unless it is empty
+        // if there was no need for any continue records, this will be the for SST record data block itself
+        if (strlen($recordData) > 0) {
+            $recordDatas[] = $recordData;
+        }
+
+        // combine into one chunk with all the blocks SST, CONTINUE,...
+        $chunk = '';
+        foreach ($recordDatas as $i => $recordData) {
+            // first block should have the SST record header, remaing should have CONTINUE header
+            $record = ($i == 0) ? 0x00FC : 0x003C;
+
+            $header = pack("vv", $record, strlen($recordData));
+            $data = $header . $recordData;
+
+            $chunk .= $this->writeData($data);
+        }
+
+        return $chunk;
+    }
+
+    /**
+     * Writes the MSODRAWINGGROUP record if needed. Possibly split using CONTINUE records.
+     */
+    private function _writeMsoDrawingGroup() {
+        // write the Escher stream if necessary
+        if (isset($this->_escher)) {
+            $writer = new PHPExcel_Writer_Excel5_Escher($this->_escher);
+            $data = $writer->close();
+
+            $record = 0x00EB;
+            $length = strlen($data);
+            $header = pack("vv", $record, $length);
+
+            return $this->writeData($header . $data);
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Get Escher object
+     *
+     * @return PHPExcel_Shared_Escher
+     */
+    public function getEscher() {
+        return $this->_escher;
+    }
+
+    /**
+     * Set Escher object
+     *
+     * @param PHPExcel_Shared_Escher $pValue
+     */
+    public function setEscher(PHPExcel_Shared_Escher $pValue = null) {
+        $this->_escher = $pValue;
+    }
+
+}

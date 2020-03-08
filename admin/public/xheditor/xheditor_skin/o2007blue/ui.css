@@ -90,8 +90,8 @@
 .xheDialog a:hover{text-decoration:underline;color:#00f}
 .xheDialog div{padding:2px 0px;}
 .xheDialog input{
-	margin:0;border-width:1px;border-style:solid;font-size:12px;
-	*border-width:expression((type!="checkbox")?'1px':0);*padding:expression((type=="text")?'1px':'auto');*width:expression((type=="text")?'160px':'auto');*border-color:expression((type=="text")?'#ABADB3':'#fff #888 #888 #fff');*background:expression((type=="button")?'#F0F0F0':'#FFFFFF');*cursor:expression((type=="button")?'pointer':'');*font-size:expression((type=="button")?'13px':'12px');
+    margin:0;border-width:1px;border-style:solid;font-size:12px;
+    *border-width:expression((type!="checkbox")?'1px':0);*padding:expression((type=="text")?'1px':'auto');*width:expression((type=="text")?'160px':'auto');*border-color:expression((type=="text")?'#ABADB3':'#fff #888 #888 #fff');*background:expression((type=="button")?'#F0F0F0':'#FFFFFF');*cursor:expression((type=="button")?'pointer':'');*font-size:expression((type=="button")?'13px':'12px');
 }
 .xheDialog textarea{font-size:12px;resize:none;border:1px solid #ccc;}
 .xheDialog input[type=text]{padding:1px;width:160px;border-color:#ABADB3;}
@@ -107,23 +107,23 @@
 .xheDialog .xheUpload .xheText {position: absolute;width:107px;top: 0px;left: 0px;z-index: 1000003;}
 
 .xheModal{
-	position: fixed;z-index: 1000010;text-align:left;top:50%;left:50%;background:#FFF;border:1px solid #ABC6DD;font-size:12px;
-	_position:absolute;_margin-top:expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 'px');
+    position: fixed;z-index: 1000010;text-align:left;top:50%;left:50%;background:#FFF;border:1px solid #ABC6DD;font-size:12px;
+    _position:absolute;_margin-top:expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 'px');
 }
 .xheModalTitle{padding:5px;background:#D1DEEF;border-bottom:1px solid #ABC6DD;}
 .xheModalClose{float:right;width:16px;height:16px;background:url(img/close.gif);cursor:pointer;}
 .xheModalIfmWait{width:100%;height:100%;background:url(img/waiting.gif) no-repeat 50% 50%;margin:-16 0 0 -16;}
 .xheModalShadow{
-	position:fixed;z-index:1000009;top:50%;left:50%;background:#000;opacity:0.2; -ms-filter:'alpha(opacity=20)'; filter:alpha(opacity=20);
-	_position:absolute;_margin-top:expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 5 + 'px');
+    position:fixed;z-index:1000009;top:50%;left:50%;background:#000;opacity:0.2; -ms-filter:'alpha(opacity=20)'; filter:alpha(opacity=20);
+    _position:absolute;_margin-top:expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 5 + 'px');
 }
 .xheModalOverlay{
-	position: fixed;z-index:1000008;top: 0px;left: 0px;height:100%;width:100%;background-color:#000;opacity:0.2; -ms-filter:'alpha(opacity=20)'; filter:alpha(opacity=20);
-	_position:absolute;_height:expression(Math.max(document.documentElement.clientHeight,document.documentElement.scrollHeight)+'px');_width:expression(Math.max(document.documentElement.clientWidth,document.documentElement.scrollWidth)+'px');
+    position: fixed;z-index:1000008;top: 0px;left: 0px;height:100%;width:100%;background-color:#000;opacity:0.2; -ms-filter:'alpha(opacity=20)'; filter:alpha(opacity=20);
+    _position:absolute;_height:expression(Math.max(document.documentElement.clientHeight,document.documentElement.scrollHeight)+'px');_width:expression(Math.max(document.documentElement.clientWidth,document.documentElement.scrollWidth)+'px');
 }
 *html{
-	background-image:url(about:blank);
-	background-attachment:fixed;
+    background-image:url(about:blank);
+    background-attachment:fixed;
 }
 
 .xheProgress{position:relative;width:280px;margin:auto;border:1px solid #C1C1C1;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;background:url(img/progressbg.gif) #E9E9E9;}
@@ -133,8 +133,8 @@
 .xhe_Fullfix{overflow:hidden;}
 .xhe_Fullfix body{width:100%;height:100%;}
 .xhe_Fullscreen{
-	top:0px;left:0px;position:fixed;z-index:100000;width:100%;height:100%;background:#fff;
-	_position:absolute;_top:expression((document.compatMode?documentElement.scrollTop:document.body.scrollTop)+'px');_width:expression((document.compatMode?documentElement.offsetWidth:document.body.offsetWidth) + 'px');_height:expression((document.compatMode?documentElement.offsetHeight:document.body.offsetHeight) + 'px');
+    top:0px;left:0px;position:fixed;z-index:100000;width:100%;height:100%;background:#fff;
+    _position:absolute;_top:expression((document.compatMode?documentElement.scrollTop:document.body.scrollTop)+'px');_width:expression((document.compatMode?documentElement.offsetWidth:document.body.offsetWidth) + 'px');_height:expression((document.compatMode?documentElement.offsetHeight:document.body.offsetHeight) + 'px');
 }
 
 .xheHideArea{position:absolute;top:-1000px;left:-1000px;visibility:hidden;}

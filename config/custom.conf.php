@@ -11,9 +11,9 @@ return array(
         'charset' => 'utf8',
         'sources' => array(
             'main' => array(
-                'database' => 'baseCode',
+                'database' => 'basecode',
                 'user' => 'root',
-                'pass' => 'root',
+                'pass' => '123456',
                 'host' => 'localhost',
                 'port' => '3306',
             ),

@@ -1,25 +1,21 @@
 <?php
+
 /**
  * Smarty plugin
  *
- * @package Smarty
+ * @package    Smarty
  * @subpackage PluginsModifierCompiler
  */
 
 /**
  * Smarty noprint modifier plugin
- *
- * Type:     modifier<br>
- * Name:     noprint<br>
+ * Type:     modifier
+ * Name:     noprint
  * Purpose:  return an empty string
  *
- * @author   Uwe Tews
- * @param array $params parameters
+ * @author Uwe Tews
  * @return string with compiled code
  */
-function smarty_modifiercompiler_noprint($params, $compiler)
-{
+function smarty_modifiercompiler_noprint() {
     return "''";
 }
-
-?>

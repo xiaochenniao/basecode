@@ -920,3 +920,158 @@ class PHPExcel_ReferenceHelper
 		throw new PHPExcel_Exception("Cloning a Singleton is not allowed!");
 	}
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ort($cellTokens);
+                        ksort($newCellTokens);
+                    }   //  Update cell references in the formula
+                    $formulaBlock = str_replace('\\', '', preg_replace($cellTokens, $newCellTokens, $formulaBlock));
+                }
+            }
+        }
+        unset($formulaBlock);
+
+        //	Then rebuild the formula string
+        return implode('"', $formulaBlocks);
+    }
+
+    /**
+     * Update cell reference
+     *
+     * @param	string	$pCellRange			Cell range
+     * @param	int		$pBefore			Insert before this one
+     * @param	int		$pNumCols			Number of columns to increment
+     * @param	int		$pNumRows			Number of rows to increment
+     * @return	string	Updated cell range
+     * @throws	PHPExcel_Exception
+     */
+    public function updateCellReference($pCellRange = 'A1', $pBefore = 'A1', $pNumCols = 0, $pNumRows = 0) {
+        // Is it in another worksheet? Will not have to update anything.
+        if (strpos($pCellRange, "!") !== false) {
+            return $pCellRange;
+            // Is it a range or a single cell?
+        } elseif (strpos($pCellRange, ':') === false && strpos($pCellRange, ',') === false) {
+            // Single cell
+            return $this->_updateSingleCellReference($pCellRange, $pBefore, $pNumCols, $pNumRows);
+        } elseif (strpos($pCellRange, ':') !== false || strpos($pCellRange, ',') !== false) {
+            // Range
+            return $this->_updateCellRange($pCellRange, $pBefore, $pNumCols, $pNumRows);
+        } else {
+            // Return original
+            return $pCellRange;
+        }
+    }
+
+    /**
+     * Update named formulas (i.e. containing worksheet references / named ranges)
+     *
+     * @param PHPExcel $pPhpExcel	Object to update
+     * @param string $oldName		Old name (name to replace)
+     * @param string $newName		New name
+     */
+    public function updateNamedFormulas(PHPExcel $pPhpExcel, $oldName = '', $newName = '') {
+        if ($oldName == '') {
+            return;
+        }
+
+        foreach ($pPhpExcel->getWorksheetIterator() as $sheet) {
+            foreach ($sheet->getCellCollection(false) as $cellID) {
+                $cell = $sheet->getCell($cellID);
+                if (($cell !== NULL) && ($cell->getDataType() == PHPExcel_Cell_DataType::TYPE_FORMULA)) {
+                    $formula = $cell->getValue();
+                    if (strpos($formula, $oldName) !== false) {
+                        $formula = str_replace("'" . $oldName . "'!", "'" . $newName . "'!", $formula);
+                        $formula = str_replace($oldName . "!", $newName . "!", $formula);
+                        $cell->setValueExplicit($formula, PHPExcel_Cell_DataType::TYPE_FORMULA);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Update cell range
+     *
+     * @param	string	$pCellRange			Cell range	(e.g. 'B2:D4', 'B:C' or '2:3')
+     * @param	int		$pBefore			Insert before this one
+     * @param	int		$pNumCols			Number of columns to increment
+     * @param	int		$pNumRows			Number of rows to increment
+     * @return	string	Updated cell range
+     * @throws	PHPExcel_Exception
+     */
+    private function _updateCellRange($pCellRange = 'A1:A1', $pBefore = 'A1', $pNumCols = 0, $pNumRows = 0) {
+        if (strpos($pCellRange, ':') !== false || strpos($pCellRange, ',') !== false) {
+            // Update range
+            $range = PHPExcel_Cell::splitRange($pCellRange);
+            $ic = count($range);
+            for ($i = 0; $i < $ic; ++$i) {
+                $jc = count($range[$i]);
+                for ($j = 0; $j < $jc; ++$j) {
+                    if (ctype_alpha($range[$i][$j])) {
+                        $r = PHPExcel_Cell::coordinateFromString($this->_updateSingleCellReference($range[$i][$j] . '1', $pBefore, $pNumCols, $pNumRows));
+                        $range[$i][$j] = $r[0];
+                    } elseif (ctype_digit($range[$i][$j])) {
+                        $r = PHPExcel_Cell::coordinateFromString($this->_updateSingleCellReference('A' . $range[$i][$j], $pBefore, $pNumCols, $pNumRows));
+                        $range[$i][$j] = $r[1];
+                    } else {
+                        $range[$i][$j] = $this->_updateSingleCellReference($range[$i][$j], $pBefore, $pNumCols, $pNumRows);
+                    }
+                }
+            }
+
+            // Recreate range string
+            return PHPExcel_Cell::buildRange($range);
+        } else {
+            throw new PHPExcel_Exception("Only cell ranges may be passed to this method.");
+        }
+    }
+
+    /**
+     * Update single cell reference
+     *
+     * @param	string	$pCellReference		Single cell reference
+     * @param	int		$pBefore			Insert before this one
+     * @param	int		$pNumCols			Number of columns to increment
+     * @param	int		$pNumRows			Number of rows to increment
+     * @return	string	Updated cell reference
+     * @throws	PHPExcel_Exception
+     */
+    private function _updateSingleCellReference($pCellReference = 'A1', $pBefore = 'A1', $pNumCols = 0, $pNumRows = 0) {
+        if (strpos($pCellReference, ':') === false && strpos($pCellReference, ',') === false) {
+            // Get coordinates of $pBefore
+            list($beforeColumn, $beforeRow) = PHPExcel_Cell::coordinateFromString($pBefore);
+
+            // Get coordinates of $pCellReference
+            list($newColumn, $newRow) = PHPExcel_Cell::coordinateFromString($pCellReference);
+
+            // Verify which parts should be updated
+            $updateColumn = (($newColumn{0} != '$') && ($beforeColumn{0} != '$') &&
+                    PHPExcel_Cell::columnIndexFromString($newColumn) >= PHPExcel_Cell::columnIndexFromString($beforeColumn));
+            $updateRow = (($newRow{0} != '$') && ($beforeRow{0} != '$') &&
+                    $newRow >= $beforeRow);
+
+            // Create new column reference
+            if ($updateColumn) {
+                $newColumn = PHPExcel_Cell::stringFromColumnIndex(PHPExcel_Cell::columnIndexFromString($newColumn) - 1 + $pNumCols);
+            }
+
+            // Create new row reference
+            if ($updateRow) {
+                $newRow = $newRow + $pNumRows;
+            }
+
+            // Return new reference
+            return $newColumn . $newRow;
+        } else {
+            throw new PHPExcel_Exception("Only single cell references may be passed to this method.");
+        }
+    }
+
+    /**
+     * __clone implementation. Cloning should not be allowed in a Singleton!
+     *
+     * @throws	PHPExcel_Exception
+     */
+    public final function __clone() {
+        throw new PHPExcel_Exception("Cloning a Singleton is not allowed!");
+    }
+
+}

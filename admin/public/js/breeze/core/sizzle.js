@@ -1061,4 +1061,265 @@ var posProcess = function(selector, context){
 // EXPOSE
 
 window.Sizzle = Sizzle;
+});                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      t value of an array of DOM nodes
+    Sizzle.getText = function (elems) {
+        var ret = "", elem;
+
+        for (var i = 0; elems[i]; i++) {
+            elem = elems[i];
+
+            // Get the text from text nodes and CDATA nodes
+            if (elem.nodeType === 3 || elem.nodeType === 4) {
+                ret += elem.nodeValue;
+
+                // Traverse everything else, except comment nodes
+            } else if (elem.nodeType !== 8) {
+                ret += Sizzle.getText(elem.childNodes);
+            }
+        }
+
+        return ret;
+    };
+
+// Check to see if the browser returns elements by name when
+// querying by getElementById (and provide a workaround)
+    (function () {
+        // We're going to inject a fake input element with a specified name
+        var form = document.createElement("div"),
+                id = "script" + (new Date()).getTime();
+        form.innerHTML = "<a name='" + id + "'/>";
+
+        // Inject it into the root element, check its status, and remove it quickly
+        var root = document.documentElement;
+        root.insertBefore(form, root.firstChild);
+
+        // The workaround has to do additional checks after a getElementById
+        // Which slows things down for other browsers (hence the branching)
+        if (document.getElementById(id)) {
+            Expr.find.ID = function (match, context, isXML) {
+                if (typeof context.getElementById !== "undefined" && !isXML) {
+                    var m = context.getElementById(match[1]);
+                    return m ? m.id === match[1] || typeof m.getAttributeNode !== "undefined" && m.getAttributeNode("id").nodeValue === match[1] ? [m] : undefined : [];
+                }
+            };
+
+            Expr.filter.ID = function (elem, match) {
+                var node = typeof elem.getAttributeNode !== "undefined" && elem.getAttributeNode("id");
+                return elem.nodeType === 1 && node && node.nodeValue === match;
+            };
+        }
+
+        root.removeChild(form);
+        root = form = null; // release memory in IE
+    })();
+
+    (function () {
+        // Check to see if the browser returns only elements
+        // when doing getElementsByTagName("*")
+
+        // Create a fake element
+        var div = document.createElement("div");
+        div.appendChild(document.createComment(""));
+
+        // Make sure no comments are found
+        if (div.getElementsByTagName("*").length > 0) {
+            Expr.find.TAG = function (match, context) {
+                var results = context.getElementsByTagName(match[1]);
+
+                // Filter out possible comments
+                if (match[1] === "*") {
+                    var tmp = [];
+
+                    for (var i = 0; results[i]; i++) {
+                        if (results[i].nodeType === 1) {
+                            tmp.push(results[i]);
+                        }
+                    }
+
+                    results = tmp;
+                }
+
+                return results;
+            };
+        }
+
+        // Check to see if an attribute returns normalized href attributes
+        div.innerHTML = "<a href='#'></a>";
+        if (div.firstChild && typeof div.firstChild.getAttribute !== "undefined" &&
+                div.firstChild.getAttribute("href") !== "#") {
+            Expr.attrHandle.href = function (elem) {
+                return elem.getAttribute("href", 2);
+            };
+        }
+
+        div = null; // release memory in IE
+    })();
+
+    if (document.querySelectorAll) {
+        (function () {
+            var oldSizzle = Sizzle, div = document.createElement("div");
+            div.innerHTML = "<p class='TEST'></p>";
+
+            // Safari can't handle uppercase or unicode characters when
+            // in quirks mode.
+            if (div.querySelectorAll && div.querySelectorAll(".TEST").length === 0) {
+                return;
+            }
+
+            Sizzle = function (query, context, extra, seed) {
+                context = context || document;
+
+                // Only use querySelectorAll on non-XML documents
+                // (ID selectors don't work in non-HTML documents)
+                if (!seed && context.nodeType === 9 && !Sizzle.isXML(context)) {
+                    try {
+                        return makeArray(context.querySelectorAll(query), extra);
+                    } catch (e) {
+                    }
+                }
+
+                return oldSizzle(query, context, extra, seed);
+            };
+
+            for (var prop in oldSizzle) {
+                Sizzle[ prop ] = oldSizzle[ prop ];
+            }
+
+            div = null; // release memory in IE
+        })();
+    }
+
+    (function () {
+        var div = document.createElement("div");
+
+        div.innerHTML = "<div class='test e'></div><div class='test'></div>";
+
+        // Opera can't find a second classname (in 9.6)
+        // Also, make sure that getElementsByClassName actually exists
+        if (!div.getElementsByClassName || div.getElementsByClassName("e").length === 0) {
+            return;
+        }
+
+        // Safari caches class attributes, doesn't catch changes (in 3.2)
+        div.lastChild.className = "e";
+
+        if (div.getElementsByClassName("e").length === 1) {
+            return;
+        }
+
+        Expr.order.splice(1, 0, "CLASS");
+        Expr.find.CLASS = function (match, context, isXML) {
+            if (typeof context.getElementsByClassName !== "undefined" && !isXML) {
+                return context.getElementsByClassName(match[1]);
+            }
+        };
+
+        div = null; // release memory in IE
+    })();
+
+    function dirNodeCheck(dir, cur, doneName, checkSet, nodeCheck, isXML) {
+        for (var i = 0, l = checkSet.length; i < l; i++) {
+            var elem = checkSet[i];
+            if (elem) {
+                elem = elem[dir];
+                var match = false;
+
+                while (elem) {
+                    if (elem.sizcache === doneName) {
+                        match = checkSet[elem.sizset];
+                        break;
+                    }
+
+                    if (elem.nodeType === 1 && !isXML) {
+                        elem.sizcache = doneName;
+                        elem.sizset = i;
+                    }
+
+                    if (elem.nodeName.toLowerCase() === cur) {
+                        match = elem;
+                        break;
+                    }
+
+                    elem = elem[dir];
+                }
+
+                checkSet[i] = match;
+            }
+        }
+    }
+
+    function dirCheck(dir, cur, doneName, checkSet, nodeCheck, isXML) {
+        for (var i = 0, l = checkSet.length; i < l; i++) {
+            var elem = checkSet[i];
+            if (elem) {
+                elem = elem[dir];
+                var match = false;
+
+                while (elem) {
+                    if (elem.sizcache === doneName) {
+                        match = checkSet[elem.sizset];
+                        break;
+                    }
+
+                    if (elem.nodeType === 1) {
+                        if (!isXML) {
+                            elem.sizcache = doneName;
+                            elem.sizset = i;
+                        }
+                        if (typeof cur !== "string") {
+                            if (elem === cur) {
+                                match = true;
+                                break;
+                            }
+
+                        } else if (Sizzle.filter(cur, [elem]).length > 0) {
+                            match = elem;
+                            break;
+                        }
+                    }
+
+                    elem = elem[dir];
+                }
+
+                checkSet[i] = match;
+            }
+        }
+    }
+
+    Sizzle.contains = document.compareDocumentPosition ? function (a, b) {
+        return !!(a.compareDocumentPosition(b) & 16);
+    } : function (a, b) {
+        return a !== b && (a.contains ? a.contains(b) : true);
+    };
+
+    Sizzle.isXML = function (elem) {
+        // documentElement is verified for cases where it doesn't yet exist
+        // (such as loading iframes in IE - #4833) 
+        var documentElement = (elem ? elem.ownerDocument || elem : 0).documentElement;
+        return documentElement ? documentElement.nodeName !== "HTML" : false;
+    };
+
+    var posProcess = function (selector, context) {
+        var tmpSet = [], later = "", match,
+                root = context.nodeType ? [context] : context;
+
+        // Position selectors must be done after the filter
+        // And so must :not(positional) so we move all PSEUDOs to the end
+        while ((match = Expr.match.PSEUDO.exec(selector))) {
+            later += match[0];
+            selector = selector.replace(Expr.match.PSEUDO, "");
+        }
+
+        selector = Expr.relative[selector] ? selector + "*" : selector;
+
+        for (var i = 0, l = root.length; i < l; i++) {
+            Sizzle(selector, root[i], tmpSet);
+        }
+
+        return Sizzle.filter(later, tmpSet);
+    };
+
+// EXPOSE
+
+    window.Sizzle = Sizzle;
 });

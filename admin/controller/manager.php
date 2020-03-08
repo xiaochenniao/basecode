@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 管理员管理程序
  */
-
 class manager_Controller extends Controller {
 
     function indexAction() {

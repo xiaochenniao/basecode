@@ -853,3 +853,160 @@ class PHPExcel_Chart_Renderer_jpgraph
 	}	//	function __construct()
 
 }	//	PHPExcel_Chart_Renderer_jpgraph
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   D);
+        }
+    }
+
+//	function _renderStockChart()
+
+    private function _renderContourChart($groupCount, $dimensions) {
+        require_once('jpgraph_contour.php');
+
+        $this->_renderCartesianPlotArea('intint');
+
+        for ($i = 0; $i < $groupCount; ++$i) {
+            $this->_renderPlotContour($i);
+        }
+    }
+
+//	function _renderContourChart()
+
+    private function _renderCombinationChart($groupCount, $dimensions, $outputDestination) {
+        require_once('jpgraph_line.php');
+        require_once('jpgraph_bar.php');
+        require_once('jpgraph_scatter.php');
+        require_once('jpgraph_regstat.php');
+        require_once('jpgraph_line.php');
+
+        $this->_renderCartesianPlotArea();
+
+        for ($i = 0; $i < $groupCount; ++$i) {
+            $dimensions = null;
+            $chartType = $this->_chart->getPlotArea()->getPlotGroupByIndex($i)->getPlotType();
+            switch ($chartType) {
+                case 'area3DChart' :
+                    $dimensions = '3d';
+                case 'areaChart' :
+                    $this->_renderPlotLine($i, True, True, $dimensions);
+                    break;
+                case 'bar3DChart' :
+                    $dimensions = '3d';
+                case 'barChart' :
+                    $this->_renderPlotBar($i, $dimensions);
+                    break;
+                case 'line3DChart' :
+                    $dimensions = '3d';
+                case 'lineChart' :
+                    $this->_renderPlotLine($i, False, True, $dimensions);
+                    break;
+                case 'scatterChart' :
+                    $this->_renderPlotScatter($i, false);
+                    break;
+                case 'bubbleChart' :
+                    $this->_renderPlotScatter($i, true);
+                    break;
+                default :
+                    $this->_graph = null;
+                    return false;
+            }
+        }
+
+        $this->_renderLegend();
+
+        $this->_graph->Stroke($outputDestination);
+        return true;
+    }
+
+//	function _renderCombinationChart()
+
+    public function render($outputDestination) {
+        self::$_plotColour = 0;
+
+        $groupCount = $this->_chart->getPlotArea()->getPlotGroupCount();
+
+        $dimensions = null;
+        if ($groupCount == 1) {
+            $chartType = $this->_chart->getPlotArea()->getPlotGroupByIndex(0)->getPlotType();
+        } else {
+            $chartTypes = array();
+            for ($i = 0; $i < $groupCount; ++$i) {
+                $chartTypes[] = $this->_chart->getPlotArea()->getPlotGroupByIndex($i)->getPlotType();
+            }
+            $chartTypes = array_unique($chartTypes);
+            if (count($chartTypes) == 1) {
+                $chartType = array_pop($chartTypes);
+            } elseif (count($chartTypes) == 0) {
+                echo 'Chart is not yet implemented<br />';
+                return false;
+            } else {
+                return $this->_renderCombinationChart($groupCount, $dimensions, $outputDestination);
+            }
+        }
+
+        switch ($chartType) {
+            case 'area3DChart' :
+                $dimensions = '3d';
+            case 'areaChart' :
+                $this->_renderAreaChart($groupCount, $dimensions);
+                break;
+            case 'bar3DChart' :
+                $dimensions = '3d';
+            case 'barChart' :
+                $this->_renderBarChart($groupCount, $dimensions);
+                break;
+            case 'line3DChart' :
+                $dimensions = '3d';
+            case 'lineChart' :
+                $this->_renderLineChart($groupCount, $dimensions);
+                break;
+            case 'pie3DChart' :
+                $dimensions = '3d';
+            case 'pieChart' :
+                $this->_renderPieChart($groupCount, $dimensions, False, False);
+                break;
+            case 'doughnut3DChart' :
+                $dimensions = '3d';
+            case 'doughnutChart' :
+                $this->_renderPieChart($groupCount, $dimensions, True, True);
+                break;
+            case 'scatterChart' :
+                $this->_renderScatterChart($groupCount);
+                break;
+            case 'bubbleChart' :
+                $this->_renderBubbleChart($groupCount);
+                break;
+            case 'radarChart' :
+                $this->_renderRadarChart($groupCount);
+                break;
+            case 'surface3DChart' :
+                $dimensions = '3d';
+            case 'surfaceChart' :
+                $this->_renderContourChart($groupCount, $dimensions);
+                break;
+            case 'stockChart' :
+                $this->_renderStockChart($groupCount, $dimensions);
+                break;
+            default :
+                echo $chartType . ' is not yet implemented<br />';
+                return false;
+        }
+        $this->_renderLegend();
+
+        $this->_graph->Stroke($outputDestination);
+        return true;
+    }
+
+//	function render()
+
+    /**
+     * Create a new PHPExcel_Chart_Renderer_jpgraph
+     */
+    public function __construct(PHPExcel_Chart $chart) {
+        $this->_graph = null;
+        $this->_chart = $chart;
+    }
+
+//	function __construct()
+}
+
+//	PHPExcel_Chart_Renderer_jpgraph

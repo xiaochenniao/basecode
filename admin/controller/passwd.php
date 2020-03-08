@@ -3,7 +3,6 @@
 /**
  * 后台管理用户 自行修改密码
  */
-
 class passwd_Controller extends Controller {
 
     function indexAction() {

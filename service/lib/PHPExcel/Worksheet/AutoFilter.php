@@ -856,3 +856,135 @@ class PHPExcel_Worksheet_AutoFilter
 	}
 
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  )
+                            );
+                        } else {
+                            //	Date based
+                            if ($dynamicRuleType{0} == 'M' || $dynamicRuleType{0} == 'Q') {
+                                //	Month or Quarter
+                                sscanf($dynamicRuleType, '%[A-Z]%d', $periodType, $period);
+                                if ($periodType == 'M') {
+                                    $ruleValues = array($period);
+                                } else {
+                                    --$period;
+                                    $periodEnd = (1 + $period) * 3;
+                                    $periodStart = 1 + $period * 3;
+                                    $ruleValues = range($periodStart, periodEnd);
+                                }
+                                $columnFilterTests[$columnID] = array(
+                                    'method' => '_filterTestInPeriodDateSet',
+                                    'arguments' => $ruleValues
+                                );
+                                $filterColumn->setAttributes(array());
+                            } else {
+                                //	Date Range
+                                $columnFilterTests[$columnID] = $this->_dynamicFilterDateRange($dynamicRuleType, $filterColumn);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case PHPExcel_Worksheet_AutoFilter_Column::AUTOFILTER_FILTERTYPE_TOPTENFILTER :
+                    $ruleValues = array();
+                    $dataRowCount = $rangeEnd[1] - $rangeStart[1];
+                    foreach ($rules as $rule) {
+                        //	We should only ever have one Dynamic Filter Rule anyway
+                        $toptenRuleType = $rule->getGrouping();
+                        $ruleValue = $rule->getValue();
+                        $ruleOperator = $rule->getOperator();
+                    }
+                    if ($ruleOperator === PHPExcel_Worksheet_AutoFilter_Column_Rule::AUTOFILTER_COLUMN_RULE_TOPTEN_PERCENT) {
+                        $ruleValue = floor($ruleValue * ($dataRowCount / 100));
+                    }
+                    if ($ruleValue < 1)
+                        $ruleValue = 1;
+                    if ($ruleValue > 500)
+                        $ruleValue = 500;
+
+                    $maxVal = $this->_calculateTopTenValue($columnID, $rangeStart[1] + 1, $rangeEnd[1], $toptenRuleType, $ruleValue);
+
+                    $operator = ($toptenRuleType == PHPExcel_Worksheet_AutoFilter_Column_Rule::AUTOFILTER_COLUMN_RULE_TOPTEN_TOP) ? PHPExcel_Worksheet_AutoFilter_Column_Rule::AUTOFILTER_COLUMN_RULE_GREATERTHANOREQUAL : PHPExcel_Worksheet_AutoFilter_Column_Rule::AUTOFILTER_COLUMN_RULE_LESSTHANOREQUAL;
+                    $ruleValues[] = array('operator' => $operator,
+                        'value' => $maxVal
+                    );
+                    $columnFilterTests[$columnID] = array(
+                        'method' => '_filterTestInCustomDataSet',
+                        'arguments' => array('filterRules' => $ruleValues,
+                            'join' => PHPExcel_Worksheet_AutoFilter_Column::AUTOFILTER_COLUMN_JOIN_OR
+                        )
+                    );
+                    $filterColumn->setAttributes(
+                            array('maxVal' => $maxVal)
+                    );
+                    break;
+            }
+        }
+
+//		echo 'Column Filter Test CRITERIA',PHP_EOL;
+//		var_dump($columnFilterTests);
+//
+        //	Execute the column tests for each row in the autoFilter range to determine show/hide,
+        for ($row = $rangeStart[1] + 1; $row <= $rangeEnd[1]; ++$row) {
+//			echo 'Testing Row = ',$row,PHP_EOL;
+            $result = TRUE;
+            foreach ($columnFilterTests as $columnID => $columnFilterTest) {
+//				echo 'Testing cell ',$columnID.$row,PHP_EOL;
+                $cellValue = $this->_workSheet->getCell($columnID . $row)->getCalculatedValue();
+//				echo 'Value is ',$cellValue,PHP_EOL;
+                //	Execute the filter test
+                $result = $result &&
+                        call_user_func_array(
+                                array('PHPExcel_Worksheet_AutoFilter', $columnFilterTest['method']), array(
+                            $cellValue,
+                            $columnFilterTest['arguments']
+                                )
+                );
+//				echo (($result) ? 'VALID' : 'INVALID'),PHP_EOL;
+                //	If filter test has resulted in FALSE, exit the loop straightaway rather than running any more tests
+                if (!$result)
+                    break;
+            }
+            //	Set show/hide for the row based on the result of the autoFilter result
+//			echo (($result) ? 'SHOW' : 'HIDE'),PHP_EOL;
+            $this->_workSheet->getRowDimension($row)->setVisible($result);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Implement PHP __clone to create a deep clone, not just a shallow copy.
+     */
+    public function __clone() {
+        $vars = get_object_vars($this);
+        foreach ($vars as $key => $value) {
+            if (is_object($value)) {
+                if ($key == '_workSheet') {
+                    //	Detach from worksheet
+                    $this->{$key} = NULL;
+                } else {
+                    $this->{$key} = clone $value;
+                }
+            } elseif ((is_array($value)) && ($key == '_columns')) {
+                //	The columns array of PHPExcel_Worksheet_AutoFilter objects
+                $this->{$key} = array();
+                foreach ($value as $k => $v) {
+                    $this->{$key}[$k] = clone $v;
+                    // attach the new cloned Column to this new cloned Autofilter object
+                    $this->{$key}[$k]->setParent($this);
+                }
+            } else {
+                $this->{$key} = $value;
+            }
+        }
+    }
+
+    /**
+     * toString method replicates previous behavior by returning the range if object is
+     *    referenced as a property of its parent.
+     */
+    public function __toString() {
+        return (string) $this->_range;
+    }
+
+}

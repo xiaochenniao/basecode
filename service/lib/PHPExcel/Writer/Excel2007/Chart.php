@@ -1201,3 +1201,93 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
 	}
 
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        (!is_null($x)) {
+                $objWriter->startElement('c:x');
+                $objWriter->writeAttribute('val', $x);
+                $objWriter->endElement();
+            }
+
+            $y = $layout->getYPosition();
+            if (!is_null($y)) {
+                $objWriter->startElement('c:y');
+                $objWriter->writeAttribute('val', $y);
+                $objWriter->endElement();
+            }
+
+            $w = $layout->getWidth();
+            if (!is_null($w)) {
+                $objWriter->startElement('c:w');
+                $objWriter->writeAttribute('val', $w);
+                $objWriter->endElement();
+            }
+
+            $h = $layout->getHeight();
+            if (!is_null($h)) {
+                $objWriter->startElement('c:h');
+                $objWriter->writeAttribute('val', $h);
+                $objWriter->endElement();
+            }
+
+            $objWriter->endElement();
+        }
+
+        $objWriter->endElement();
+    }
+
+    /**
+     * Write Alternate Content block
+     *
+     * @param 	PHPExcel_Shared_XMLWriter 	$objWriter 		XML Writer
+     * @throws 	PHPExcel_Writer_Exception
+     */
+    private function _writeAlternateContent($objWriter) {
+        $objWriter->startElement('mc:AlternateContent');
+        $objWriter->writeAttribute('xmlns:mc', 'http://schemas.openxmlformats.org/markup-compatibility/2006');
+
+        $objWriter->startElement('mc:Choice');
+        $objWriter->writeAttribute('xmlns:c14', 'http://schemas.microsoft.com/office/drawing/2007/8/2/chart');
+        $objWriter->writeAttribute('Requires', 'c14');
+
+        $objWriter->startElement('c14:style');
+        $objWriter->writeAttribute('val', '102');
+        $objWriter->endElement();
+        $objWriter->endElement();
+
+        $objWriter->startElement('mc:Fallback');
+        $objWriter->startElement('c:style');
+        $objWriter->writeAttribute('val', '2');
+        $objWriter->endElement();
+        $objWriter->endElement();
+
+        $objWriter->endElement();
+    }
+
+    /**
+     * Write Printer Settings
+     *
+     * @param 	PHPExcel_Shared_XMLWriter 	$objWriter 		XML Writer
+     * @throws 	PHPExcel_Writer_Exception
+     */
+    private function _writePrintSettings($objWriter) {
+        $objWriter->startElement('c:printSettings');
+
+        $objWriter->startElement('c:headerFooter');
+        $objWriter->endElement();
+
+        $objWriter->startElement('c:pageMargins');
+        $objWriter->writeAttribute('footer', 0.3);
+        $objWriter->writeAttribute('header', 0.3);
+        $objWriter->writeAttribute('r', 0.7);
+        $objWriter->writeAttribute('l', 0.7);
+        $objWriter->writeAttribute('t', 0.75);
+        $objWriter->writeAttribute('b', 0.75);
+        $objWriter->endElement();
+
+        $objWriter->startElement('c:pageSetup');
+        $objWriter->writeAttribute('orientation', "portrait");
+        $objWriter->endElement();
+
+        $objWriter->endElement();
+    }
+
+}

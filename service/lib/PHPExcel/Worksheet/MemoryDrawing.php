@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -25,7 +26,6 @@
  * @version    1.8.0, 2014-03-02
  */
 
-
 /**
  * PHPExcel_Worksheet_MemoryDrawing
  *
@@ -33,61 +33,60 @@
  * @package    PHPExcel_Worksheet
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing implements PHPExcel_IComparable
-{
-	/* Rendering functions */
-	const RENDERING_DEFAULT					= 'imagepng';
-	const RENDERING_PNG						= 'imagepng';
-	const RENDERING_GIF						= 'imagegif';
-	const RENDERING_JPEG					= 'imagejpeg';
+class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing implements PHPExcel_IComparable {
+    /* Rendering functions */
 
-	/* MIME types */
-	const MIMETYPE_DEFAULT					= 'image/png';
-	const MIMETYPE_PNG						= 'image/png';
-	const MIMETYPE_GIF						= 'image/gif';
-	const MIMETYPE_JPEG						= 'image/jpeg';
+    const RENDERING_DEFAULT = 'imagepng';
+    const RENDERING_PNG = 'imagepng';
+    const RENDERING_GIF = 'imagegif';
+    const RENDERING_JPEG = 'imagejpeg';
 
-	/**
-	 * Image resource
-	 *
-	 * @var resource
-	 */
-	private $_imageResource;
+    /* MIME types */
+    const MIMETYPE_DEFAULT = 'image/png';
+    const MIMETYPE_PNG = 'image/png';
+    const MIMETYPE_GIF = 'image/gif';
+    const MIMETYPE_JPEG = 'image/jpeg';
 
-	/**
-	 * Rendering function
-	 *
-	 * @var string
-	 */
-	private $_renderingFunction;
+    /**
+     * Image resource
+     *
+     * @var resource
+     */
+    private $_imageResource;
 
-	/**
-	 * Mime type
-	 *
-	 * @var string
-	 */
-	private $_mimeType;
+    /**
+     * Rendering function
+     *
+     * @var string
+     */
+    private $_renderingFunction;
 
-	/**
-	 * Unique name
-	 *
-	 * @var string
-	 */
-	private $_uniqueName;
+    /**
+     * Mime type
+     *
+     * @var string
+     */
+    private $_mimeType;
+
+    /**
+     * Unique name
+     *
+     * @var string
+     */
+    private $_uniqueName;
 
     /**
      * Create a new PHPExcel_Worksheet_MemoryDrawing
      */
-    public function __construct()
-    {
-    	// Initialise values
-    	$this->_imageResource		= null;
-    	$this->_renderingFunction 	= self::RENDERING_DEFAULT;
-    	$this->_mimeType			= self::MIMETYPE_DEFAULT;
-    	$this->_uniqueName			= md5(rand(0, 9999). time() . rand(0, 9999));
+    public function __construct() {
+        // Initialise values
+        $this->_imageResource = null;
+        $this->_renderingFunction = self::RENDERING_DEFAULT;
+        $this->_mimeType = self::MIMETYPE_DEFAULT;
+        $this->_uniqueName = md5(rand(0, 9999) . time() . rand(0, 9999));
 
-    	// Initialize parent
-    	parent::__construct();
+        // Initialize parent
+        parent::__construct();
     }
 
     /**
@@ -96,7 +95,7 @@ class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing im
      * @return resource
      */
     public function getImageResource() {
-    	return $this->_imageResource;
+        return $this->_imageResource;
     }
 
     /**
@@ -106,14 +105,14 @@ class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing im
      * @return PHPExcel_Worksheet_MemoryDrawing
      */
     public function setImageResource($value = null) {
-    	$this->_imageResource = $value;
+        $this->_imageResource = $value;
 
-    	if (!is_null($this->_imageResource)) {
-	    	// Get width/height
-	    	$this->_width	= imagesx($this->_imageResource);
-	    	$this->_height	= imagesy($this->_imageResource);
-    	}
-    	return $this;
+        if (!is_null($this->_imageResource)) {
+            // Get width/height
+            $this->_width = imagesx($this->_imageResource);
+            $this->_height = imagesy($this->_imageResource);
+        }
+        return $this;
     }
 
     /**
@@ -122,7 +121,7 @@ class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing im
      * @return string
      */
     public function getRenderingFunction() {
-    	return $this->_renderingFunction;
+        return $this->_renderingFunction;
     }
 
     /**
@@ -132,8 +131,8 @@ class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing im
      * @return PHPExcel_Worksheet_MemoryDrawing
      */
     public function setRenderingFunction($value = PHPExcel_Worksheet_MemoryDrawing::RENDERING_DEFAULT) {
-    	$this->_renderingFunction = $value;
-    	return $this;
+        $this->_renderingFunction = $value;
+        return $this;
     }
 
     /**
@@ -142,7 +141,7 @@ class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing im
      * @return string
      */
     public function getMimeType() {
-    	return $this->_mimeType;
+        return $this->_mimeType;
     }
 
     /**
@@ -152,8 +151,8 @@ class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing im
      * @return PHPExcel_Worksheet_MemoryDrawing
      */
     public function setMimeType($value = PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT) {
-    	$this->_mimeType = $value;
-    	return $this;
+        $this->_mimeType = $value;
+        return $this;
     }
 
     /**
@@ -162,39 +161,40 @@ class PHPExcel_Worksheet_MemoryDrawing extends PHPExcel_Worksheet_BaseDrawing im
      * @return string
      */
     public function getIndexedFilename() {
-		$extension 	= strtolower($this->getMimeType());
-		$extension 	= explode('/', $extension);
-		$extension 	= $extension[1];
+        $extension = strtolower($this->getMimeType());
+        $extension = explode('/', $extension);
+        $extension = $extension[1];
 
-    	return $this->_uniqueName . $this->getImageIndex() . '.' . $extension;
+        return $this->_uniqueName . $this->getImageIndex() . '.' . $extension;
     }
 
-	/**
-	 * Get hash code
-	 *
-	 * @return string	Hash code
-	 */
-	public function getHashCode() {
-    	return md5(
-    		  $this->_renderingFunction
-    		. $this->_mimeType
-    		. $this->_uniqueName
-    		. parent::getHashCode()
-    		. __CLASS__
-    	);
+    /**
+     * Get hash code
+     *
+     * @return string	Hash code
+     */
+    public function getHashCode() {
+        return md5(
+                $this->_renderingFunction
+                . $this->_mimeType
+                . $this->_uniqueName
+                . parent::getHashCode()
+                . __CLASS__
+        );
     }
 
-	/**
-	 * Implement PHP __clone to create a deep clone, not just a shallow copy.
-	 */
-	public function __clone() {
-		$vars = get_object_vars($this);
-		foreach ($vars as $key => $value) {
-			if (is_object($value)) {
-				$this->$key = clone $value;
-			} else {
-				$this->$key = $value;
-			}
-		}
-	}
+    /**
+     * Implement PHP __clone to create a deep clone, not just a shallow copy.
+     */
+    public function __clone() {
+        $vars = get_object_vars($this);
+        foreach ($vars as $key => $value) {
+            if (is_object($value)) {
+                $this->$key = clone $value;
+            } else {
+                $this->$key = $value;
+            }
+        }
+    }
+
 }

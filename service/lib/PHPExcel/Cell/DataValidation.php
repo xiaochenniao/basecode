@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -25,7 +26,6 @@
  * @version    1.8.0, 2014-03-02
  */
 
-
 /**
  * PHPExcel_Cell_DataValidation
  *
@@ -33,32 +33,32 @@
  * @package    PHPExcel_Cell
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Cell_DataValidation
-{
+class PHPExcel_Cell_DataValidation {
     /* Data validation types */
-    const TYPE_NONE        = 'none';
-    const TYPE_CUSTOM      = 'custom';
-    const TYPE_DATE        = 'date';
-    const TYPE_DECIMAL     = 'decimal';
-    const TYPE_LIST        = 'list';
-    const TYPE_TEXTLENGTH  = 'textLength';
-    const TYPE_TIME        = 'time';
-    const TYPE_WHOLE       = 'whole';
+
+    const TYPE_NONE = 'none';
+    const TYPE_CUSTOM = 'custom';
+    const TYPE_DATE = 'date';
+    const TYPE_DECIMAL = 'decimal';
+    const TYPE_LIST = 'list';
+    const TYPE_TEXTLENGTH = 'textLength';
+    const TYPE_TIME = 'time';
+    const TYPE_WHOLE = 'whole';
 
     /* Data validation error styles */
-    const STYLE_STOP         = 'stop';
-    const STYLE_WARNING      = 'warning';
-    const STYLE_INFORMATION  = 'information';
+    const STYLE_STOP = 'stop';
+    const STYLE_WARNING = 'warning';
+    const STYLE_INFORMATION = 'information';
 
     /* Data validation operators */
-    const OPERATOR_BETWEEN             = 'between';
-    const OPERATOR_EQUAL               = 'equal';
-    const OPERATOR_GREATERTHAN         = 'greaterThan';
-    const OPERATOR_GREATERTHANOREQUAL  = 'greaterThanOrEqual';
-    const OPERATOR_LESSTHAN            = 'lessThan';
-    const OPERATOR_LESSTHANOREQUAL     = 'lessThanOrEqual';
-    const OPERATOR_NOTBETWEEN          = 'notBetween';
-    const OPERATOR_NOTEQUAL            = 'notEqual';
+    const OPERATOR_BETWEEN = 'between';
+    const OPERATOR_EQUAL = 'equal';
+    const OPERATOR_GREATERTHAN = 'greaterThan';
+    const OPERATOR_GREATERTHANOREQUAL = 'greaterThanOrEqual';
+    const OPERATOR_LESSTHAN = 'lessThan';
+    const OPERATOR_LESSTHANOREQUAL = 'lessThanOrEqual';
+    const OPERATOR_NOTBETWEEN = 'notBetween';
+    const OPERATOR_NOTEQUAL = 'notEqual';
 
     /**
      * Formula 1
@@ -154,22 +154,21 @@ class PHPExcel_Cell_DataValidation
     /**
      * Create a new PHPExcel_Cell_DataValidation
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Initialise member variables
-        $this->_formula1          = '';
-        $this->_formula2          = '';
-        $this->_type              = PHPExcel_Cell_DataValidation::TYPE_NONE;
-        $this->_errorStyle        = PHPExcel_Cell_DataValidation::STYLE_STOP;
-        $this->_operator          = '';
-        $this->_allowBlank        = FALSE;
-        $this->_showDropDown      = FALSE;
-        $this->_showInputMessage  = FALSE;
-        $this->_showErrorMessage  = FALSE;
-        $this->_errorTitle        = '';
-        $this->_error             = '';
-        $this->_promptTitle       = '';
-        $this->_prompt            = '';
+        $this->_formula1 = '';
+        $this->_formula2 = '';
+        $this->_type = PHPExcel_Cell_DataValidation::TYPE_NONE;
+        $this->_errorStyle = PHPExcel_Cell_DataValidation::STYLE_STOP;
+        $this->_operator = '';
+        $this->_allowBlank = FALSE;
+        $this->_showDropDown = FALSE;
+        $this->_showInputMessage = FALSE;
+        $this->_showErrorMessage = FALSE;
+        $this->_errorTitle = '';
+        $this->_error = '';
+        $this->_promptTitle = '';
+        $this->_prompt = '';
     }
 
     /**
@@ -439,20 +438,20 @@ class PHPExcel_Cell_DataValidation
      */
     public function getHashCode() {
         return md5(
-              $this->_formula1
-            . $this->_formula2
-            . $this->_type = PHPExcel_Cell_DataValidation::TYPE_NONE
-            . $this->_errorStyle = PHPExcel_Cell_DataValidation::STYLE_STOP
-            . $this->_operator
-            . ($this->_allowBlank ? 't' : 'f')
-            . ($this->_showDropDown ? 't' : 'f')
-            . ($this->_showInputMessage ? 't' : 'f')
-            . ($this->_showErrorMessage ? 't' : 'f')
-            . $this->_errorTitle
-            . $this->_error
-            . $this->_promptTitle
-            . $this->_prompt
-            . __CLASS__
+                $this->_formula1
+                . $this->_formula2
+                . $this->_type = PHPExcel_Cell_DataValidation::TYPE_NONE
+                . $this->_errorStyle = PHPExcel_Cell_DataValidation::STYLE_STOP
+                . $this->_operator
+                . ($this->_allowBlank ? 't' : 'f')
+                . ($this->_showDropDown ? 't' : 'f')
+                . ($this->_showInputMessage ? 't' : 'f')
+                . ($this->_showErrorMessage ? 't' : 'f')
+                . $this->_errorTitle
+                . $this->_error
+                . $this->_promptTitle
+                . $this->_prompt
+                . __CLASS__
         );
     }
 
@@ -469,4 +468,5 @@ class PHPExcel_Cell_DataValidation
             }
         }
     }
+
 }

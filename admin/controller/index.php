@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 后台首页引导页
  */
-
 class index_Controller extends Controller {
 
     function indexAction() {

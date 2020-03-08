@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 定时任务管理
  */
-
 class crond_controller extends controller {
 
     function indexAction() {

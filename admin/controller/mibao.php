@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 密保卡登录程序
  */
-
 class mibao_Controller extends Controller {
 
     function init() {

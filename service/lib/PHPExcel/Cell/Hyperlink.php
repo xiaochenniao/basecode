@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -25,7 +26,6 @@
  * @version    1.8.0, 2014-03-02
  */
 
-
 /**
  * PHPExcel_Cell_Hyperlink
  *
@@ -33,8 +33,8 @@
  * @package    PHPExcel_Cell
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Cell_Hyperlink
-{
+class PHPExcel_Cell_Hyperlink {
+
     /**
      * URL to link the cell to
      *
@@ -55,11 +55,10 @@ class PHPExcel_Cell_Hyperlink
      * @param  string  $pUrl      Url to link the cell to
      * @param  string  $pTooltip  Tooltip to display on the hyperlink
      */
-    public function __construct($pUrl = '', $pTooltip = '')
-    {
+    public function __construct($pUrl = '', $pTooltip = '') {
         // Initialise member variables
-        $this->_url         = $pUrl;
-        $this->_tooltip     = $pTooltip;
+        $this->_url = $pUrl;
+        $this->_tooltip = $pTooltip;
     }
 
     /**
@@ -118,9 +117,10 @@ class PHPExcel_Cell_Hyperlink
      */
     public function getHashCode() {
         return md5(
-              $this->_url
-            . $this->_tooltip
-            . __CLASS__
+                $this->_url
+                . $this->_tooltip
+                . __CLASS__
         );
     }
+
 }

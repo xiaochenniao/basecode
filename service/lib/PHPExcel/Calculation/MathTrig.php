@@ -1371,3 +1371,187 @@ class PHPExcel_Calculation_MathTrig {
 	}	//	function TRUNC()
 
 }	//	class PHPExcel_Calculation_MathTrig
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     );
+        $wrkCellCount = count($wrkArray);
+
+        for ($i = 0; $i < $wrkCellCount; ++$i) {
+            if ((!is_numeric($wrkArray[$i])) || (is_string($wrkArray[$i]))) {
+                $wrkArray[$i] = 0;
+            }
+        }
+
+        foreach ($arrayList as $matrixData) {
+            $array2 = PHPExcel_Calculation_Functions::flattenArray($matrixData);
+            $count = count($array2);
+            if ($wrkCellCount != $count) {
+                return PHPExcel_Calculation_Functions::VALUE();
+            }
+
+            foreach ($array2 as $i => $val) {
+                if ((!is_numeric($val)) || (is_string($val))) {
+                    $val = 0;
+                }
+                $wrkArray[$i] *= $val;
+            }
+        }
+
+        return array_sum($wrkArray);
+    }
+
+//	function SUMPRODUCT()
+
+    /**
+     * SUMSQ
+     *
+     * SUMSQ returns the sum of the squares of the arguments
+     *
+     * Excel Function:
+     * 		SUMSQ(value1[,value2[, ...]])
+     *
+     * @access	public
+     * @category Mathematical and Trigonometric Functions
+     * @param	mixed		$arg,...		Data values
+     * @return	float
+     */
+    public static function SUMSQ() {
+        // Return value
+        $returnValue = 0;
+
+        // Loop through arguments
+        foreach (PHPExcel_Calculation_Functions::flattenArray(func_get_args()) as $arg) {
+            // Is it a numeric value?
+            if ((is_numeric($arg)) && (!is_string($arg))) {
+                $returnValue += ($arg * $arg);
+            }
+        }
+
+        // Return
+        return $returnValue;
+    }
+
+//	function SUMSQ()
+
+    /**
+     * SUMX2MY2
+     *
+     * @param	mixed[]	$matrixData1	Matrix #1
+     * @param	mixed[]	$matrixData2	Matrix #2
+     * @return	float
+     */
+    public static function SUMX2MY2($matrixData1, $matrixData2) {
+        $array1 = PHPExcel_Calculation_Functions::flattenArray($matrixData1);
+        $array2 = PHPExcel_Calculation_Functions::flattenArray($matrixData2);
+        $count1 = count($array1);
+        $count2 = count($array2);
+        if ($count1 < $count2) {
+            $count = $count1;
+        } else {
+            $count = $count2;
+        }
+
+        $result = 0;
+        for ($i = 0; $i < $count; ++$i) {
+            if (((is_numeric($array1[$i])) && (!is_string($array1[$i]))) &&
+                    ((is_numeric($array2[$i])) && (!is_string($array2[$i])))) {
+                $result += ($array1[$i] * $array1[$i]) - ($array2[$i] * $array2[$i]);
+            }
+        }
+
+        return $result;
+    }
+
+//	function SUMX2MY2()
+
+    /**
+     * SUMX2PY2
+     *
+     * @param	mixed[]	$matrixData1	Matrix #1
+     * @param	mixed[]	$matrixData2	Matrix #2
+     * @return	float
+     */
+    public static function SUMX2PY2($matrixData1, $matrixData2) {
+        $array1 = PHPExcel_Calculation_Functions::flattenArray($matrixData1);
+        $array2 = PHPExcel_Calculation_Functions::flattenArray($matrixData2);
+        $count1 = count($array1);
+        $count2 = count($array2);
+        if ($count1 < $count2) {
+            $count = $count1;
+        } else {
+            $count = $count2;
+        }
+
+        $result = 0;
+        for ($i = 0; $i < $count; ++$i) {
+            if (((is_numeric($array1[$i])) && (!is_string($array1[$i]))) &&
+                    ((is_numeric($array2[$i])) && (!is_string($array2[$i])))) {
+                $result += ($array1[$i] * $array1[$i]) + ($array2[$i] * $array2[$i]);
+            }
+        }
+
+        return $result;
+    }
+
+//	function SUMX2PY2()
+
+    /**
+     * SUMXMY2
+     *
+     * @param	mixed[]	$matrixData1	Matrix #1
+     * @param	mixed[]	$matrixData2	Matrix #2
+     * @return	float
+     */
+    public static function SUMXMY2($matrixData1, $matrixData2) {
+        $array1 = PHPExcel_Calculation_Functions::flattenArray($matrixData1);
+        $array2 = PHPExcel_Calculation_Functions::flattenArray($matrixData2);
+        $count1 = count($array1);
+        $count2 = count($array2);
+        if ($count1 < $count2) {
+            $count = $count1;
+        } else {
+            $count = $count2;
+        }
+
+        $result = 0;
+        for ($i = 0; $i < $count; ++$i) {
+            if (((is_numeric($array1[$i])) && (!is_string($array1[$i]))) &&
+                    ((is_numeric($array2[$i])) && (!is_string($array2[$i])))) {
+                $result += ($array1[$i] - $array2[$i]) * ($array1[$i] - $array2[$i]);
+            }
+        }
+
+        return $result;
+    }
+
+//	function SUMXMY2()
+
+    /**
+     * TRUNC
+     *
+     * Truncates value to the number of fractional digits by number_digits.
+     *
+     * @param	float		$value
+     * @param	int			$digits
+     * @return	float		Truncated value
+     */
+    public static function TRUNC($value = 0, $digits = 0) {
+        $value = PHPExcel_Calculation_Functions::flattenSingleValue($value);
+        $digits = PHPExcel_Calculation_Functions::flattenSingleValue($digits);
+
+        // Validate parameters
+        if ((!is_numeric($value)) || (!is_numeric($digits)))
+            return PHPExcel_Calculation_Functions::VALUE();
+        $digits = floor($digits);
+
+        // Truncate
+        $adjust = pow(10, $digits);
+
+        if (($digits > 0) && (rtrim(intval((abs($value) - abs(intval($value))) * $adjust), '0') < $adjust / 10))
+            return $value;
+
+        return (intval($value * $adjust)) / $adjust;
+    }
+
+//	function TRUNC()
+}
+
+//	class PHPExcel_Calculation_MathTrig

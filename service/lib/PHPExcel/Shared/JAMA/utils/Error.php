@@ -1,12 +1,12 @@
 <?php
-/**
- *	@package JAMA
- *
- *	Error handling
- *	@author Michael Bommarito
- *	@version 01292005
- */
 
+/**
+ * 	@package JAMA
+ *
+ * 	Error handling
+ * 	@author Michael Bommarito
+ * 	@version 01292005
+ */
 //Language constant
 define('JAMALANG', 'EN');
 
@@ -17,14 +17,14 @@ define('JAMALANG', 'EN');
 $error = array();
 
 /*
-I've used Babelfish and a little poor knowledge of Romance/Germanic languages for the translations here.
-Feel free to correct anything that looks amiss to you.
-*/
+  I've used Babelfish and a little poor knowledge of Romance/Germanic languages for the translations here.
+  Feel free to correct anything that looks amiss to you.
+ */
 
 define('PolymorphicArgumentException', -1);
 $error['EN'][PolymorphicArgumentException] = "Invalid argument pattern for polymorphic function.";
-$error['FR'][PolymorphicArgumentException] = "Modèle inadmissible d'argument pour la fonction polymorphe.".
-$error['DE'][PolymorphicArgumentException] = "Unzulässiges Argumentmuster für polymorphe Funktion.";
+$error['FR'][PolymorphicArgumentException] = "Modèle inadmissible d'argument pour la fonction polymorphe." .
+        $error['DE'][PolymorphicArgumentException] = "Unzulässiges Argumentmuster für polymorphe Funktion.";
 
 define('ArgumentTypeException', -2);
 $error['EN'][ArgumentTypeException] = "Invalid argument type.";
@@ -64,19 +64,19 @@ define('RowLengthException', -10);
 $error['EN'][RowLengthException] = "All rows must have the same length.";
 
 /**
- *	Custom error handler
- *	@param int $num Error number
+ * 	Custom error handler
+ * 	@param int $num Error number
  */
 function JAMAError($errorNumber = null) {
-	global $error;
+    global $error;
 
-	if (isset($errorNumber)) {
-		if (isset($error[JAMALANG][$errorNumber])) {
-			return $error[JAMALANG][$errorNumber];
-		} else {
-			return $error['EN'][$errorNumber];
-		}
-	} else {
-		return ("Invalid argument to JAMAError()");
-	}
+    if (isset($errorNumber)) {
+        if (isset($error[JAMALANG][$errorNumber])) {
+            return $error[JAMALANG][$errorNumber];
+        } else {
+            return $error['EN'][$errorNumber];
+        }
+    } else {
+        return ("Invalid argument to JAMAError()");
+    }
 }

@@ -1530,3 +1530,202 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 	}
 	
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+    public function getImagesRoot() {
+        return $this->_imagesRoot;
+    }
+
+    /**
+     * Set images root
+     *
+     * @param string $pValue
+     * @return PHPExcel_Writer_HTML
+     */
+    public function setImagesRoot($pValue = '.') {
+        $this->_imagesRoot = $pValue;
+        return $this;
+    }
+
+    /**
+     * Get embed images
+     *
+     * @return boolean
+     */
+    public function getEmbedImages() {
+        return $this->_embedImages;
+    }
+
+    /**
+     * Set embed images
+     *
+     * @param boolean $pValue
+     * @return PHPExcel_Writer_HTML
+     */
+    public function setEmbedImages($pValue = '.') {
+        $this->_embedImages = $pValue;
+        return $this;
+    }
+
+    /**
+     * Get use inline CSS?
+     *
+     * @return boolean
+     */
+    public function getUseInlineCss() {
+        return $this->_useInlineCss;
+    }
+
+    /**
+     * Set use inline CSS?
+     *
+     * @param boolean $pValue
+     * @return PHPExcel_Writer_HTML
+     */
+    public function setUseInlineCss($pValue = false) {
+        $this->_useInlineCss = $pValue;
+        return $this;
+    }
+
+    /**
+     * Add color to formatted string as inline style
+     *
+     * @param string $pValue Plain formatted value without color
+     * @param string $pFormat Format code
+     * @return string
+     */
+    public function formatColor($pValue, $pFormat) {
+        // Color information, e.g. [Red] is always at the beginning
+        $color = null; // initialize
+        $matches = array();
+
+        $color_regex = '/^\\[[a-zA-Z]+\\]/';
+        if (preg_match($color_regex, $pFormat, $matches)) {
+            $color = str_replace('[', '', $matches[0]);
+            $color = str_replace(']', '', $color);
+            $color = strtolower($color);
+        }
+
+        // convert to PCDATA
+        $value = htmlspecialchars($pValue);
+
+        // color span tag
+        if ($color !== null) {
+            $value = '<span style="color:' . $color . '">' . $value . '</span>';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Calculate information about HTML colspan and rowspan which is not always the same as Excel's
+     */
+    private function _calculateSpans() {
+        // Identify all cells that should be omitted in HTML due to cell merge.
+        // In HTML only the upper-left cell should be written and it should have
+        //   appropriate rowspan / colspan attribute
+        $sheetIndexes = $this->_sheetIndex !== null ?
+                array($this->_sheetIndex) : range(0, $this->_phpExcel->getSheetCount() - 1);
+
+        foreach ($sheetIndexes as $sheetIndex) {
+            $sheet = $this->_phpExcel->getSheet($sheetIndex);
+
+            $candidateSpannedRow = array();
+
+            // loop through all Excel merged cells
+            foreach ($sheet->getMergeCells() as $cells) {
+                list($cells, ) = PHPExcel_Cell::splitRange($cells);
+                $first = $cells[0];
+                $last = $cells[1];
+
+                list($fc, $fr) = PHPExcel_Cell::coordinateFromString($first);
+                $fc = PHPExcel_Cell::columnIndexFromString($fc) - 1;
+
+                list($lc, $lr) = PHPExcel_Cell::coordinateFromString($last);
+                $lc = PHPExcel_Cell::columnIndexFromString($lc) - 1;
+
+                // loop through the individual cells in the individual merge
+                $r = $fr - 1;
+                while ($r++ < $lr) {
+                    // also, flag this row as a HTML row that is candidate to be omitted
+                    $candidateSpannedRow[$r] = $r;
+
+                    $c = $fc - 1;
+                    while ($c++ < $lc) {
+                        if (!($c == $fc && $r == $fr)) {
+                            // not the upper-left cell (should not be written in HTML)
+                            $this->_isSpannedCell[$sheetIndex][$r][$c] = array(
+                                'baseCell' => array($fr, $fc),
+                            );
+                        } else {
+                            // upper-left is the base cell that should hold the colspan/rowspan attribute
+                            $this->_isBaseCell[$sheetIndex][$r][$c] = array(
+                                'xlrowspan' => $lr - $fr + 1, // Excel rowspan
+                                'rowspan' => $lr - $fr + 1, // HTML rowspan, value may change
+                                'xlcolspan' => $lc - $fc + 1, // Excel colspan
+                                'colspan' => $lc - $fc + 1, // HTML colspan, value may change
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Identify which rows should be omitted in HTML. These are the rows where all the cells
+            //   participate in a merge and the where base cells are somewhere above.
+            $countColumns = PHPExcel_Cell::columnIndexFromString($sheet->getHighestColumn());
+            foreach ($candidateSpannedRow as $rowIndex) {
+                if (isset($this->_isSpannedCell[$sheetIndex][$rowIndex])) {
+                    if (count($this->_isSpannedCell[$sheetIndex][$rowIndex]) == $countColumns) {
+                        $this->_isSpannedRow[$sheetIndex][$rowIndex] = $rowIndex;
+                    };
+                }
+            }
+
+            // For each of the omitted rows we found above, the affected rowspans should be subtracted by 1
+            if (isset($this->_isSpannedRow[$sheetIndex])) {
+                foreach ($this->_isSpannedRow[$sheetIndex] as $rowIndex) {
+                    $adjustedBaseCells = array();
+                    $c = -1;
+                    $e = $countColumns - 1;
+                    while ($c++ < $e) {
+                        $baseCell = $this->_isSpannedCell[$sheetIndex][$rowIndex][$c]['baseCell'];
+
+                        if (!in_array($baseCell, $adjustedBaseCells)) {
+                            // subtract rowspan by 1
+                            --$this->_isBaseCell[$sheetIndex][$baseCell[0]][$baseCell[1]]['rowspan'];
+                            $adjustedBaseCells[] = $baseCell;
+                        }
+                    }
+                }
+            }
+
+            // TODO: Same for columns
+        }
+
+        // We have calculated the spans
+        $this->_spansAreCalculated = true;
+    }
+
+    private function _setMargins(PHPExcel_Worksheet $pSheet) {
+        $htmlPage = '@page { ';
+        $htmlBody = 'body { ';
+
+        $left = PHPExcel_Shared_String::FormatNumber($pSheet->getPageMargins()->getLeft()) . 'in; ';
+        $htmlPage .= 'left-margin: ' . $left;
+        $htmlBody .= 'left-margin: ' . $left;
+        $right = PHPExcel_Shared_String::FormatNumber($pSheet->getPageMargins()->getRight()) . 'in; ';
+        $htmlPage .= 'right-margin: ' . $right;
+        $htmlBody .= 'right-margin: ' . $right;
+        $top = PHPExcel_Shared_String::FormatNumber($pSheet->getPageMargins()->getTop()) . 'in; ';
+        $htmlPage .= 'top-margin: ' . $top;
+        $htmlBody .= 'top-margin: ' . $top;
+        $bottom = PHPExcel_Shared_String::FormatNumber($pSheet->getPageMargins()->getBottom()) . 'in; ';
+        $htmlPage .= 'bottom-margin: ' . $bottom;
+        $htmlBody .= 'bottom-margin: ' . $bottom;
+
+        $htmlPage .= "}\n";
+        $htmlBody .= "}\n";
+
+        return "<style>\n" . $htmlPage . $htmlBody . "</style>\n";
+    }
+
+}

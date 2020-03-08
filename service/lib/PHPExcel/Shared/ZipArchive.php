@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -24,12 +25,10 @@
  * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
  * @version    1.8.0, 2014-03-02
  */
-
 if (!defined('PCLZIP_TEMPORARY_DIR')) {
-	define('PCLZIP_TEMPORARY_DIR', PHPExcel_Shared_File::sys_get_temp_dir());
+    define('PCLZIP_TEMPORARY_DIR', PHPExcel_Shared_File::sys_get_temp_dir());
 }
 require_once PHPEXCEL_ROOT . 'PHPExcel/Shared/PCLZip/pclzip.lib.php';
-
 
 /**
  * PHPExcel_Shared_ZipArchive
@@ -38,78 +37,69 @@ require_once PHPEXCEL_ROOT . 'PHPExcel/Shared/PCLZip/pclzip.lib.php';
  * @package    PHPExcel_Shared_ZipArchive
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Shared_ZipArchive
-{
+class PHPExcel_Shared_ZipArchive {
 
-	/**	constants */
-	const OVERWRITE		= 'OVERWRITE';
-	const CREATE		= 'CREATE';
-
-
-	/**
-	 * Temporary storage directory
-	 *
-	 * @var string
-	 */
-	private $_tempDir;
-
-	/**
-	 * Zip Archive Stream Handle
-	 *
-	 * @var string
-	 */
-	private $_zip;
-
+    /** 	constants */
+    const OVERWRITE = 'OVERWRITE';
+    const CREATE = 'CREATE';
 
     /**
-	 * Open a new zip archive
-	 *
-	 * @param	string	$fileName	Filename for the zip archive
-	 * @return	boolean
+     * Temporary storage directory
+     *
+     * @var string
      */
-	public function open($fileName)
-	{
-		$this->_tempDir = PHPExcel_Shared_File::sys_get_temp_dir();
-
-		$this->_zip = new PclZip($fileName);
-
-		return true;
-	}
-
+    private $_tempDir;
 
     /**
-	 * Close this zip archive
-	 *
+     * Zip Archive Stream Handle
+     *
+     * @var string
      */
-	public function close()
-	{
-	}
-
+    private $_zip;
 
     /**
-	 * Add a new file to the zip archive from a string of raw data.
-	 *
-	 * @param	string	$localname		Directory/Name of the file to add to the zip archive
-	 * @param	string	$contents		String of data to add to the zip archive
+     * Open a new zip archive
+     *
+     * @param	string	$fileName	Filename for the zip archive
+     * @return	boolean
      */
-	public function addFromString($localname, $contents)
-	{
-		$filenameParts = pathinfo($localname);
+    public function open($fileName) {
+        $this->_tempDir = PHPExcel_Shared_File::sys_get_temp_dir();
 
-		$handle = fopen($this->_tempDir.'/'.$filenameParts["basename"], "wb");
-		fwrite($handle, $contents);
-		fclose($handle);
+        $this->_zip = new PclZip($fileName);
 
-		$res = $this->_zip->add($this->_tempDir.'/'.$filenameParts["basename"],
-								PCLZIP_OPT_REMOVE_PATH, $this->_tempDir,
-								PCLZIP_OPT_ADD_PATH, $filenameParts["dirname"]
-							   );
-		if ($res == 0) {
-			throw new PHPExcel_Writer_Exception("Error zipping files : " . $this->_zip->errorInfo(true));
-		}
+        return true;
+    }
 
-		unlink($this->_tempDir.'/'.$filenameParts["basename"]);
-	}
+    /**
+     * Close this zip archive
+     *
+     */
+    public function close() {
+        
+    }
+
+    /**
+     * Add a new file to the zip archive from a string of raw data.
+     *
+     * @param	string	$localname		Directory/Name of the file to add to the zip archive
+     * @param	string	$contents		String of data to add to the zip archive
+     */
+    public function addFromString($localname, $contents) {
+        $filenameParts = pathinfo($localname);
+
+        $handle = fopen($this->_tempDir . '/' . $filenameParts["basename"], "wb");
+        fwrite($handle, $contents);
+        fclose($handle);
+
+        $res = $this->_zip->add($this->_tempDir . '/' . $filenameParts["basename"], PCLZIP_OPT_REMOVE_PATH, $this->_tempDir, PCLZIP_OPT_ADD_PATH, $filenameParts["dirname"]
+        );
+        if ($res == 0) {
+            throw new PHPExcel_Writer_Exception("Error zipping files : " . $this->_zip->errorInfo(true));
+        }
+
+        unlink($this->_tempDir . '/' . $filenameParts["basename"]);
+    }
 
     /**
      * Find if given fileName exist in archive (Emulate ZipArchive locateName())
@@ -117,14 +107,13 @@ class PHPExcel_Shared_ZipArchive
      * @param        string        $fileName        Filename for the file in zip archive
      * @return        boolean
      */
-    public function locateName($fileName)
-    {
+    public function locateName($fileName) {
         $list = $this->_zip->listContent();
         $listCount = count($list);
         $list_index = -1;
         for ($i = 0; $i < $listCount; ++$i) {
             if (strtolower($list[$i]["filename"]) == strtolower($fileName) ||
-                strtolower($list[$i]["stored_filename"]) == strtolower($fileName)) {
+                    strtolower($list[$i]["stored_filename"]) == strtolower($fileName)) {
                 $list_index = $i;
                 break;
             }
@@ -138,14 +127,13 @@ class PHPExcel_Shared_ZipArchive
      * @param        string        $fileName        Filename for the file in zip archive
      * @return        string  $contents        File string contents
      */
-    public function getFromName($fileName) 
-    {
+    public function getFromName($fileName) {
         $list = $this->_zip->listContent();
         $listCount = count($list);
         $list_index = -1;
         for ($i = 0; $i < $listCount; ++$i) {
             if (strtolower($list[$i]["filename"]) == strtolower($fileName) ||
-                strtolower($list[$i]["stored_filename"]) == strtolower($fileName)) {
+                    strtolower($list[$i]["stored_filename"]) == strtolower($fileName)) {
                 $list_index = $i;
                 break;
             }
@@ -158,8 +146,8 @@ class PHPExcel_Shared_ZipArchive
             $filename = substr($fileName, 1);
             $list_index = -1;
             for ($i = 0; $i < $listCount; ++$i) {
-                if (strtolower($list[$i]["filename"]) == strtolower($fileName) || 
-                    strtolower($list[$i]["stored_filename"]) == strtolower($fileName)) {
+                if (strtolower($list[$i]["filename"]) == strtolower($fileName) ||
+                        strtolower($list[$i]["stored_filename"]) == strtolower($fileName)) {
                     $list_index = $i;
                     break;
                 }
@@ -172,4 +160,5 @@ class PHPExcel_Shared_ZipArchive
 
         return $contents;
     }
+
 }

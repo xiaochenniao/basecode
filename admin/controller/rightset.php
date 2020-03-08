@@ -3,7 +3,6 @@
 /**
  * 后台管理权限设置
  */
-
 class rightset_Controller extends Controller {
 
     function indexAction() {

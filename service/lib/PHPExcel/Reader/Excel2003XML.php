@@ -800,3 +800,153 @@ class PHPExcel_Reader_Excel2003XML extends PHPExcel_Reader_Abstract implements P
 	}
 
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $cellValue = ($cellValue != 0);
+                                        break;
+                                    case 'DateTime' :
+                                        $type = PHPExcel_Cell_DataType::TYPE_NUMERIC;
+                                        $cellValue = PHPExcel_Shared_Date::PHPToExcel(strtotime($cellValue));
+                                        break;
+                                    case 'Error' :
+                                        $type = PHPExcel_Cell_DataType::TYPE_ERROR;
+                                        break;
+                                }
+                            }
+
+                            if ($hasCalculatedValue) {
+//								echo 'FORMULA<br />';
+                                $type = PHPExcel_Cell_DataType::TYPE_FORMULA;
+                                $columnNumber = PHPExcel_Cell::columnIndexFromString($columnID);
+                                if (substr($cellDataFormula, 0, 3) == 'of:') {
+                                    $cellDataFormula = substr($cellDataFormula, 3);
+//									echo 'Before: ',$cellDataFormula,'<br />';
+                                    $temp = explode('"', $cellDataFormula);
+                                    $key = false;
+                                    foreach ($temp as &$value) {
+                                        //	Only replace in alternate array entries (i.e. non-quoted blocks)
+                                        if ($key = !$key) {
+                                            $value = str_replace(array('[.', '.', ']'), '', $value);
+                                        }
+                                    }
+                                } else {
+                                    //	Convert R1C1 style references to A1 style references (but only when not quoted)
+//									echo 'Before: ',$cellDataFormula,'<br />';
+                                    $temp = explode('"', $cellDataFormula);
+                                    $key = false;
+                                    foreach ($temp as &$value) {
+                                        //	Only replace in alternate array entries (i.e. non-quoted blocks)
+                                        if ($key = !$key) {
+                                            preg_match_all('/(R(\[?-?\d*\]?))(C(\[?-?\d*\]?))/', $value, $cellReferences, PREG_SET_ORDER + PREG_OFFSET_CAPTURE);
+                                            //	Reverse the matches array, otherwise all our offsets will become incorrect if we modify our way
+                                            //		through the formula from left to right. Reversing means that we work right to left.through
+                                            //		the formula
+                                            $cellReferences = array_reverse($cellReferences);
+                                            //	Loop through each R1C1 style reference in turn, converting it to its A1 style equivalent,
+                                            //		then modify the formula to use that new reference
+                                            foreach ($cellReferences as $cellReference) {
+                                                $rowReference = $cellReference[2][0];
+                                                //	Empty R reference is the current row
+                                                if ($rowReference == '')
+                                                    $rowReference = $rowID;
+                                                //	Bracketed R references are relative to the current row
+                                                if ($rowReference{0} == '[')
+                                                    $rowReference = $rowID + trim($rowReference, '[]');
+                                                $columnReference = $cellReference[4][0];
+                                                //	Empty C reference is the current column
+                                                if ($columnReference == '')
+                                                    $columnReference = $columnNumber;
+                                                //	Bracketed C references are relative to the current column
+                                                if ($columnReference{0} == '[')
+                                                    $columnReference = $columnNumber + trim($columnReference, '[]');
+                                                $A1CellReference = PHPExcel_Cell::stringFromColumnIndex($columnReference - 1) . $rowReference;
+                                                $value = substr_replace($value, $A1CellReference, $cellReference[0][1], strlen($cellReference[0][0]));
+                                            }
+                                        }
+                                    }
+                                }
+                                unset($value);
+                                //	Then rebuild the formula string
+                                $cellDataFormula = implode('"', $temp);
+//								echo 'After: ',$cellDataFormula,'<br />';
+                            }
+
+//							echo 'Cell '.$columnID.$rowID.' is a '.$type.' with a value of '.(($hasCalculatedValue) ? $cellDataFormula : $cellValue).'<br />';
+//
+                            $objPHPExcel->getActiveSheet()->getCell($columnID . $rowID)->setValueExplicit((($hasCalculatedValue) ? $cellDataFormula : $cellValue), $type);
+                            if ($hasCalculatedValue) {
+//								echo 'Formula result is '.$cellValue.'<br />';
+                                $objPHPExcel->getActiveSheet()->getCell($columnID . $rowID)->setCalculatedValue($cellValue);
+                            }
+                            $cellIsSet = $rowHasData = true;
+                        }
+
+                        if (isset($cell->Comment)) {
+//							echo '<b>comment found</b><br />';
+                            $commentAttributes = $cell->Comment->attributes($namespaces['ss']);
+                            $author = 'unknown';
+                            if (isset($commentAttributes->Author)) {
+                                $author = (string) $commentAttributes->Author;
+//								echo 'Author: ',$author,'<br />';
+                            }
+                            $node = $cell->Comment->Data->asXML();
+//							$annotation = str_replace('html:','',substr($node,49,-10));
+//							echo $annotation,'<br />';
+                            $annotation = strip_tags($node);
+//							echo 'Annotation: ',$annotation,'<br />';
+                            $objPHPExcel->getActiveSheet()->getComment($columnID . $rowID)
+                                    ->setAuthor(self::_convertStringEncoding($author, $this->_charSet))
+                                    ->setText($this->_parseRichText($annotation));
+                        }
+
+                        if (($cellIsSet) && (isset($cell_ss['StyleID']))) {
+                            $style = (string) $cell_ss['StyleID'];
+//							echo 'Cell style for '.$columnID.$rowID.' is '.$style.'<br />';
+                            if ((isset($this->_styles[$style])) && (!empty($this->_styles[$style]))) {
+//								echo 'Cell '.$columnID.$rowID.'<br />';
+//								print_r($this->_styles[$style]);
+//								echo '<br />';
+                                if (!$objPHPExcel->getActiveSheet()->cellExists($columnID . $rowID)) {
+                                    $objPHPExcel->getActiveSheet()->getCell($columnID . $rowID)->setValue(NULL);
+                                }
+                                $objPHPExcel->getActiveSheet()->getStyle($cellRange)->applyFromArray($this->_styles[$style]);
+                            }
+                        }
+                        ++$columnID;
+                    }
+
+                    if ($rowHasData) {
+                        if (isset($row_ss['StyleID'])) {
+                            $rowStyle = $row_ss['StyleID'];
+                        }
+                        if (isset($row_ss['Height'])) {
+                            $rowHeight = $row_ss['Height'];
+//							echo '<b>Setting row height to '.$rowHeight.'</b><br />';
+                            $objPHPExcel->getActiveSheet()->getRowDimension($rowID)->setRowHeight($rowHeight);
+                        }
+                    }
+
+                    ++$rowID;
+                }
+            }
+            ++$worksheetID;
+        }
+
+        // Return
+        return $objPHPExcel;
+    }
+
+    private static function _convertStringEncoding($string, $charset) {
+        if ($charset != 'UTF-8') {
+            return PHPExcel_Shared_String::ConvertEncoding($string, 'UTF-8', $charset);
+        }
+        return $string;
+    }
+
+    private function _parseRichText($is = '') {
+        $value = new PHPExcel_RichText();
+
+        $value->createText(self::_convertStringEncoding($is, $this->_charSet));
+
+        return $value;
+    }
+
+}

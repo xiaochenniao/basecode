@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 地区数据配置
  */
-
 class area_Controller extends Controller {
 
     function indexAction() {

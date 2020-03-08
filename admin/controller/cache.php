@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 缓存管理
  */
-
 class cache_Controller extends Controller {
 
     function indexAction() {

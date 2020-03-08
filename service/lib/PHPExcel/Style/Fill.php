@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -25,7 +26,6 @@
  * @version	1.8.0, 2014-03-02
  */
 
-
 /**
  * PHPExcel_Style_Fill
  *
@@ -33,289 +33,286 @@
  * @package	PHPExcel_Style
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Style_Fill extends PHPExcel_Style_Supervisor implements PHPExcel_IComparable
-{
-	/* Fill types */
-	const FILL_NONE							= 'none';
-	const FILL_SOLID						= 'solid';
-	const FILL_GRADIENT_LINEAR				= 'linear';
-	const FILL_GRADIENT_PATH				= 'path';
-	const FILL_PATTERN_DARKDOWN				= 'darkDown';
-	const FILL_PATTERN_DARKGRAY				= 'darkGray';
-	const FILL_PATTERN_DARKGRID				= 'darkGrid';
-	const FILL_PATTERN_DARKHORIZONTAL		= 'darkHorizontal';
-	const FILL_PATTERN_DARKTRELLIS			= 'darkTrellis';
-	const FILL_PATTERN_DARKUP				= 'darkUp';
-	const FILL_PATTERN_DARKVERTICAL			= 'darkVertical';
-	const FILL_PATTERN_GRAY0625				= 'gray0625';
-	const FILL_PATTERN_GRAY125				= 'gray125';
-	const FILL_PATTERN_LIGHTDOWN			= 'lightDown';
-	const FILL_PATTERN_LIGHTGRAY			= 'lightGray';
-	const FILL_PATTERN_LIGHTGRID			= 'lightGrid';
-	const FILL_PATTERN_LIGHTHORIZONTAL		= 'lightHorizontal';
-	const FILL_PATTERN_LIGHTTRELLIS			= 'lightTrellis';
-	const FILL_PATTERN_LIGHTUP				= 'lightUp';
-	const FILL_PATTERN_LIGHTVERTICAL		= 'lightVertical';
-	const FILL_PATTERN_MEDIUMGRAY			= 'mediumGray';
+class PHPExcel_Style_Fill extends PHPExcel_Style_Supervisor implements PHPExcel_IComparable {
+    /* Fill types */
 
-	/**
-	 * Fill type
-	 *
-	 * @var string
-	 */
-	protected $_fillType	= PHPExcel_Style_Fill::FILL_NONE;
+    const FILL_NONE = 'none';
+    const FILL_SOLID = 'solid';
+    const FILL_GRADIENT_LINEAR = 'linear';
+    const FILL_GRADIENT_PATH = 'path';
+    const FILL_PATTERN_DARKDOWN = 'darkDown';
+    const FILL_PATTERN_DARKGRAY = 'darkGray';
+    const FILL_PATTERN_DARKGRID = 'darkGrid';
+    const FILL_PATTERN_DARKHORIZONTAL = 'darkHorizontal';
+    const FILL_PATTERN_DARKTRELLIS = 'darkTrellis';
+    const FILL_PATTERN_DARKUP = 'darkUp';
+    const FILL_PATTERN_DARKVERTICAL = 'darkVertical';
+    const FILL_PATTERN_GRAY0625 = 'gray0625';
+    const FILL_PATTERN_GRAY125 = 'gray125';
+    const FILL_PATTERN_LIGHTDOWN = 'lightDown';
+    const FILL_PATTERN_LIGHTGRAY = 'lightGray';
+    const FILL_PATTERN_LIGHTGRID = 'lightGrid';
+    const FILL_PATTERN_LIGHTHORIZONTAL = 'lightHorizontal';
+    const FILL_PATTERN_LIGHTTRELLIS = 'lightTrellis';
+    const FILL_PATTERN_LIGHTUP = 'lightUp';
+    const FILL_PATTERN_LIGHTVERTICAL = 'lightVertical';
+    const FILL_PATTERN_MEDIUMGRAY = 'mediumGray';
 
-	/**
-	 * Rotation
-	 *
-	 * @var double
-	 */
-	protected $_rotation	= 0;
+    /**
+     * Fill type
+     *
+     * @var string
+     */
+    protected $_fillType = PHPExcel_Style_Fill::FILL_NONE;
 
-	/**
-	 * Start color
-	 *
-	 * @var PHPExcel_Style_Color
-	 */
-	protected $_startColor;
+    /**
+     * Rotation
+     *
+     * @var double
+     */
+    protected $_rotation = 0;
 
-	/**
-	 * End color
-	 *
-	 * @var PHPExcel_Style_Color
-	 */
-	protected $_endColor;
+    /**
+     * Start color
+     *
+     * @var PHPExcel_Style_Color
+     */
+    protected $_startColor;
 
-	/**
-	 * Create a new PHPExcel_Style_Fill
-	 *
-	 * @param	boolean	$isSupervisor	Flag indicating if this is a supervisor or not
-	 *									Leave this value at default unless you understand exactly what
-	 *										its ramifications are
-	 * @param	boolean	$isConditional	Flag indicating if this is a conditional style or not
-	 *									Leave this value at default unless you understand exactly what
-	 *										its ramifications are
-	 */
-	public function __construct($isSupervisor = FALSE, $isConditional = FALSE)
-	{
-		// Supervisor?
-		parent::__construct($isSupervisor);
+    /**
+     * End color
+     *
+     * @var PHPExcel_Style_Color
+     */
+    protected $_endColor;
 
-		// Initialise values
-		if ($isConditional) {
-			$this->_fillType = NULL;
-		}
-		$this->_startColor			= new PHPExcel_Style_Color(PHPExcel_Style_Color::COLOR_WHITE, $isSupervisor, $isConditional);
-		$this->_endColor			= new PHPExcel_Style_Color(PHPExcel_Style_Color::COLOR_BLACK, $isSupervisor, $isConditional);
+    /**
+     * Create a new PHPExcel_Style_Fill
+     *
+     * @param	boolean	$isSupervisor	Flag indicating if this is a supervisor or not
+     * 									Leave this value at default unless you understand exactly what
+     * 										its ramifications are
+     * @param	boolean	$isConditional	Flag indicating if this is a conditional style or not
+     * 									Leave this value at default unless you understand exactly what
+     * 										its ramifications are
+     */
+    public function __construct($isSupervisor = FALSE, $isConditional = FALSE) {
+        // Supervisor?
+        parent::__construct($isSupervisor);
 
-		// bind parent if we are a supervisor
-		if ($isSupervisor) {
-			$this->_startColor->bindParent($this, '_startColor');
-			$this->_endColor->bindParent($this, '_endColor');
-		}
-	}
+        // Initialise values
+        if ($isConditional) {
+            $this->_fillType = NULL;
+        }
+        $this->_startColor = new PHPExcel_Style_Color(PHPExcel_Style_Color::COLOR_WHITE, $isSupervisor, $isConditional);
+        $this->_endColor = new PHPExcel_Style_Color(PHPExcel_Style_Color::COLOR_BLACK, $isSupervisor, $isConditional);
 
-	/**
-	 * Get the shared style component for the currently active cell in currently active sheet.
-	 * Only used for style supervisor
-	 *
-	 * @return PHPExcel_Style_Fill
-	 */
-	public function getSharedComponent()
-	{
-		return $this->_parent->getSharedComponent()->getFill();
-	}
+        // bind parent if we are a supervisor
+        if ($isSupervisor) {
+            $this->_startColor->bindParent($this, '_startColor');
+            $this->_endColor->bindParent($this, '_endColor');
+        }
+    }
 
-	/**
-	 * Build style array from subcomponents
-	 *
-	 * @param array $array
-	 * @return array
-	 */
-	public function getStyleArray($array)
-	{
-		return array('fill' => $array);
-	}
+    /**
+     * Get the shared style component for the currently active cell in currently active sheet.
+     * Only used for style supervisor
+     *
+     * @return PHPExcel_Style_Fill
+     */
+    public function getSharedComponent() {
+        return $this->_parent->getSharedComponent()->getFill();
+    }
 
-	/**
-	 * Apply styles from array
-	 *
-	 * <code>
-	 * $objPHPExcel->getActiveSheet()->getStyle('B2')->getFill()->applyFromArray(
-	 *		array(
-	 *			'type'	   => PHPExcel_Style_Fill::FILL_GRADIENT_LINEAR,
-	 *			'rotation'   => 0,
-	 *			'startcolor' => array(
-	 *				'rgb' => '000000'
-	 *			),
-	 *			'endcolor'   => array(
-	 *				'argb' => 'FFFFFFFF'
-	 *			)
-	 *		)
-	 * );
-	 * </code>
-	 *
-	 * @param	array	$pStyles	Array containing style information
-	 * @throws	PHPExcel_Exception
-	 * @return PHPExcel_Style_Fill
-	 */
-	public function applyFromArray($pStyles = null) {
-		if (is_array($pStyles)) {
-			if ($this->_isSupervisor) {
-				$this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($this->getStyleArray($pStyles));
-			} else {
-				if (array_key_exists('type', $pStyles)) {
-					$this->setFillType($pStyles['type']);
-				}
-				if (array_key_exists('rotation', $pStyles)) {
-					$this->setRotation($pStyles['rotation']);
-				}
-				if (array_key_exists('startcolor', $pStyles)) {
-					$this->getStartColor()->applyFromArray($pStyles['startcolor']);
-				}
-				if (array_key_exists('endcolor', $pStyles)) {
-					$this->getEndColor()->applyFromArray($pStyles['endcolor']);
-				}
-				if (array_key_exists('color', $pStyles)) {
-					$this->getStartColor()->applyFromArray($pStyles['color']);
-				}
-			}
-		} else {
-			throw new PHPExcel_Exception("Invalid style array passed.");
-		}
-		return $this;
-	}
+    /**
+     * Build style array from subcomponents
+     *
+     * @param array $array
+     * @return array
+     */
+    public function getStyleArray($array) {
+        return array('fill' => $array);
+    }
 
-	/**
-	 * Get Fill Type
-	 *
-	 * @return string
-	 */
-	public function getFillType() {
-		if ($this->_isSupervisor) {
-			return $this->getSharedComponent()->getFillType();
-		}
-		return $this->_fillType;
-	}
+    /**
+     * Apply styles from array
+     *
+     * <code>
+     * $objPHPExcel->getActiveSheet()->getStyle('B2')->getFill()->applyFromArray(
+     * 		array(
+     * 			'type'	   => PHPExcel_Style_Fill::FILL_GRADIENT_LINEAR,
+     * 			'rotation'   => 0,
+     * 			'startcolor' => array(
+     * 				'rgb' => '000000'
+     * 			),
+     * 			'endcolor'   => array(
+     * 				'argb' => 'FFFFFFFF'
+     * 			)
+     * 		)
+     * );
+     * </code>
+     *
+     * @param	array	$pStyles	Array containing style information
+     * @throws	PHPExcel_Exception
+     * @return PHPExcel_Style_Fill
+     */
+    public function applyFromArray($pStyles = null) {
+        if (is_array($pStyles)) {
+            if ($this->_isSupervisor) {
+                $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($this->getStyleArray($pStyles));
+            } else {
+                if (array_key_exists('type', $pStyles)) {
+                    $this->setFillType($pStyles['type']);
+                }
+                if (array_key_exists('rotation', $pStyles)) {
+                    $this->setRotation($pStyles['rotation']);
+                }
+                if (array_key_exists('startcolor', $pStyles)) {
+                    $this->getStartColor()->applyFromArray($pStyles['startcolor']);
+                }
+                if (array_key_exists('endcolor', $pStyles)) {
+                    $this->getEndColor()->applyFromArray($pStyles['endcolor']);
+                }
+                if (array_key_exists('color', $pStyles)) {
+                    $this->getStartColor()->applyFromArray($pStyles['color']);
+                }
+            }
+        } else {
+            throw new PHPExcel_Exception("Invalid style array passed.");
+        }
+        return $this;
+    }
 
-	/**
-	 * Set Fill Type
-	 *
-	 * @param string $pValue	PHPExcel_Style_Fill fill type
-	 * @return PHPExcel_Style_Fill
-	 */
-	public function setFillType($pValue = PHPExcel_Style_Fill::FILL_NONE) {
-		if ($this->_isSupervisor) {
-			$styleArray = $this->getStyleArray(array('type' => $pValue));
-			$this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
-		} else {
-			$this->_fillType = $pValue;
-		}
-		return $this;
-	}
+    /**
+     * Get Fill Type
+     *
+     * @return string
+     */
+    public function getFillType() {
+        if ($this->_isSupervisor) {
+            return $this->getSharedComponent()->getFillType();
+        }
+        return $this->_fillType;
+    }
 
-	/**
-	 * Get Rotation
-	 *
-	 * @return double
-	 */
-	public function getRotation() {
-		if ($this->_isSupervisor) {
-			return $this->getSharedComponent()->getRotation();
-		}
-		return $this->_rotation;
-	}
+    /**
+     * Set Fill Type
+     *
+     * @param string $pValue	PHPExcel_Style_Fill fill type
+     * @return PHPExcel_Style_Fill
+     */
+    public function setFillType($pValue = PHPExcel_Style_Fill::FILL_NONE) {
+        if ($this->_isSupervisor) {
+            $styleArray = $this->getStyleArray(array('type' => $pValue));
+            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        } else {
+            $this->_fillType = $pValue;
+        }
+        return $this;
+    }
 
-	/**
-	 * Set Rotation
-	 *
-	 * @param double $pValue
-	 * @return PHPExcel_Style_Fill
-	 */
-	public function setRotation($pValue = 0) {
-		if ($this->_isSupervisor) {
-			$styleArray = $this->getStyleArray(array('rotation' => $pValue));
-			$this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
-		} else {
-			$this->_rotation = $pValue;
-		}
-		return $this;
-	}
+    /**
+     * Get Rotation
+     *
+     * @return double
+     */
+    public function getRotation() {
+        if ($this->_isSupervisor) {
+            return $this->getSharedComponent()->getRotation();
+        }
+        return $this->_rotation;
+    }
 
-	/**
-	 * Get Start Color
-	 *
-	 * @return PHPExcel_Style_Color
-	 */
-	public function getStartColor() {
-		return $this->_startColor;
-	}
+    /**
+     * Set Rotation
+     *
+     * @param double $pValue
+     * @return PHPExcel_Style_Fill
+     */
+    public function setRotation($pValue = 0) {
+        if ($this->_isSupervisor) {
+            $styleArray = $this->getStyleArray(array('rotation' => $pValue));
+            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        } else {
+            $this->_rotation = $pValue;
+        }
+        return $this;
+    }
 
-	/**
-	 * Set Start Color
-	 *
-	 * @param	PHPExcel_Style_Color $pValue
-	 * @throws	PHPExcel_Exception
-	 * @return PHPExcel_Style_Fill
-	 */
-	public function setStartColor(PHPExcel_Style_Color $pValue = null) {
-		// make sure parameter is a real color and not a supervisor
-		$color = $pValue->getIsSupervisor() ? $pValue->getSharedComponent() : $pValue;
+    /**
+     * Get Start Color
+     *
+     * @return PHPExcel_Style_Color
+     */
+    public function getStartColor() {
+        return $this->_startColor;
+    }
 
-		if ($this->_isSupervisor) {
-			$styleArray = $this->getStartColor()->getStyleArray(array('argb' => $color->getARGB()));
-			$this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
-		} else {
-			$this->_startColor = $color;
-		}
-		return $this;
-	}
+    /**
+     * Set Start Color
+     *
+     * @param	PHPExcel_Style_Color $pValue
+     * @throws	PHPExcel_Exception
+     * @return PHPExcel_Style_Fill
+     */
+    public function setStartColor(PHPExcel_Style_Color $pValue = null) {
+        // make sure parameter is a real color and not a supervisor
+        $color = $pValue->getIsSupervisor() ? $pValue->getSharedComponent() : $pValue;
 
-	/**
-	 * Get End Color
-	 *
-	 * @return PHPExcel_Style_Color
-	 */
-	public function getEndColor() {
-		return $this->_endColor;
-	}
+        if ($this->_isSupervisor) {
+            $styleArray = $this->getStartColor()->getStyleArray(array('argb' => $color->getARGB()));
+            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        } else {
+            $this->_startColor = $color;
+        }
+        return $this;
+    }
 
-	/**
-	 * Set End Color
-	 *
-	 * @param	PHPExcel_Style_Color $pValue
-	 * @throws	PHPExcel_Exception
-	 * @return PHPExcel_Style_Fill
-	 */
-	public function setEndColor(PHPExcel_Style_Color $pValue = null) {
-		// make sure parameter is a real color and not a supervisor
-		$color = $pValue->getIsSupervisor() ? $pValue->getSharedComponent() : $pValue;
+    /**
+     * Get End Color
+     *
+     * @return PHPExcel_Style_Color
+     */
+    public function getEndColor() {
+        return $this->_endColor;
+    }
 
-		if ($this->_isSupervisor) {
-			$styleArray = $this->getEndColor()->getStyleArray(array('argb' => $color->getARGB()));
-			$this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
-		} else {
-			$this->_endColor = $color;
-		}
-		return $this;
-	}
+    /**
+     * Set End Color
+     *
+     * @param	PHPExcel_Style_Color $pValue
+     * @throws	PHPExcel_Exception
+     * @return PHPExcel_Style_Fill
+     */
+    public function setEndColor(PHPExcel_Style_Color $pValue = null) {
+        // make sure parameter is a real color and not a supervisor
+        $color = $pValue->getIsSupervisor() ? $pValue->getSharedComponent() : $pValue;
 
-	/**
-	 * Get hash code
-	 *
-	 * @return string	Hash code
-	 */
-	public function getHashCode() {
-		if ($this->_isSupervisor) {
-			return $this->getSharedComponent()->getHashCode();
-		}
-		return md5(
-			  $this->getFillType()
-			. $this->getRotation()
-			. $this->getStartColor()->getHashCode()
-			. $this->getEndColor()->getHashCode()
-			. __CLASS__
-		);
-	}
+        if ($this->_isSupervisor) {
+            $styleArray = $this->getEndColor()->getStyleArray(array('argb' => $color->getARGB()));
+            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        } else {
+            $this->_endColor = $color;
+        }
+        return $this;
+    }
+
+    /**
+     * Get hash code
+     *
+     * @return string	Hash code
+     */
+    public function getHashCode() {
+        if ($this->_isSupervisor) {
+            return $this->getSharedComponent()->getHashCode();
+        }
+        return md5(
+                $this->getFillType()
+                . $this->getRotation()
+                . $this->getStartColor()->getHashCode()
+                . $this->getEndColor()->getHashCode()
+                . __CLASS__
+        );
+    }
 
 }

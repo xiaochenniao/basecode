@@ -1580,3 +1580,85 @@ class PHPExcel_Writer_Excel5_Parser
 	}
 
 }
+                                                                                                                                                                                                                                                                                   return $result;
+    }
+
+    /**
+     * Creates a tree. In fact an array which may have one or two arrays (sub-trees)
+     * as elements.
+     *
+     * @access private
+     * @param mixed $value The value of this node.
+     * @param mixed $left  The left array (sub-tree) or a final node.
+     * @param mixed $right The right array (sub-tree) or a final node.
+     * @return array A tree
+     */
+    function _createTree($value, $left, $right) {
+        return array('value' => $value, 'left' => $left, 'right' => $right);
+    }
+
+    /**
+     * Builds a string containing the tree in reverse polish notation (What you
+     * would use in a HP calculator stack).
+     * The following tree:
+     *
+     *    +
+     *   / \
+     *  2   3
+     *
+     * produces: "23+"
+     *
+     * The following tree:
+     *
+     *    +
+     *   / \
+     *  3   *
+     *     / \
+     *    6   A1
+     *
+     * produces: "36A1*+"
+     *
+     * In fact all operands, functions, references, etc... are written as ptg's
+     *
+     * @access public
+     * @param array $tree The optional tree to convert.
+     * @return string The tree in reverse polish notation
+     */
+    function toReversePolish($tree = array()) {
+        $polish = ""; // the string we are going to return
+        if (empty($tree)) { // If it's the first call use _parse_tree
+            $tree = $this->_parse_tree;
+        }
+
+        if (is_array($tree['left'])) {
+            $converted_tree = $this->toReversePolish($tree['left']);
+            $polish .= $converted_tree;
+        } elseif ($tree['left'] != '') { // It's a final node
+            $converted_tree = $this->_convert($tree['left']);
+            $polish .= $converted_tree;
+        }
+        if (is_array($tree['right'])) {
+            $converted_tree = $this->toReversePolish($tree['right']);
+            $polish .= $converted_tree;
+        } elseif ($tree['right'] != '') { // It's a final node
+            $converted_tree = $this->_convert($tree['right']);
+            $polish .= $converted_tree;
+        }
+        // if it's a function convert it here (so we can set it's arguments)
+        if (preg_match("/^[A-Z0-9\xc0-\xdc\.]+$/", $tree['value']) and ! preg_match('/^([A-Ia-i]?[A-Za-z])(\d+)$/', $tree['value']) and ! preg_match("/^[A-Ia-i]?[A-Za-z](\d+)\.\.[A-Ia-i]?[A-Za-z](\d+)$/", $tree['value']) and ! is_numeric($tree['value']) and ! isset($this->ptg[$tree['value']])) {
+            // left subtree for a function is always an array.
+            if ($tree['left'] != '') {
+                $left_tree = $this->toReversePolish($tree['left']);
+            } else {
+                $left_tree = '';
+            }
+            // add it's left subtree and return.
+            return $left_tree . $this->_convertFunction($tree['value'], $tree['right']);
+        } else {
+            $converted_tree = $this->_convert($tree['value']);
+        }
+        $polish .= $converted_tree;
+        return $polish;
+    }
+
+}

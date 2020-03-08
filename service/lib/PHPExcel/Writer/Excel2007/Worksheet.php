@@ -1218,3 +1218,186 @@ class PHPExcel_Writer_Excel2007_Worksheet extends PHPExcel_Writer_Excel2007_Writ
 		}
 	}
 }
+                                                                                                                                                                                                                                                                          // End row
+                    $objWriter->endElement();
+                }
+            }
+
+            $objWriter->endElement();
+        } else {
+            throw new PHPExcel_Writer_Exception("Invalid parameters passed.");
+        }
+    }
+
+    /**
+     * Write Cell
+     *
+     * @param	PHPExcel_Shared_XMLWriter	$objWriter				XML Writer
+     * @param	PHPExcel_Worksheet			$pSheet					Worksheet
+     * @param	PHPExcel_Cell				$pCellAddress			Cell Address
+     * @param	string[]					$pStringTable			String table
+     * @param	string[]					$pFlippedStringTable	String table (flipped), for faster index searching
+     * @throws	PHPExcel_Writer_Exception
+     */
+    private function _writeCell(PHPExcel_Shared_XMLWriter $objWriter = null, PHPExcel_Worksheet $pSheet = null, $pCellAddress = null, $pStringTable = null, $pFlippedStringTable = null) {
+        if (is_array($pStringTable) && is_array($pFlippedStringTable)) {
+            // Cell
+            $pCell = $pSheet->getCell($pCellAddress);
+            $objWriter->startElement('c');
+            $objWriter->writeAttribute('r', $pCellAddress);
+
+            // Sheet styles
+            if ($pCell->getXfIndex() != '') {
+                $objWriter->writeAttribute('s', $pCell->getXfIndex());
+            }
+
+            // If cell value is supplied, write cell value
+            $cellValue = $pCell->getValue();
+            if (is_object($cellValue) || $cellValue !== '') {
+                // Map type
+                $mappedType = $pCell->getDataType();
+
+                // Write data type depending on its type
+                switch (strtolower($mappedType)) {
+                    case 'inlinestr': // Inline string
+                    case 's':   // String
+                    case 'b':   // Boolean
+                        $objWriter->writeAttribute('t', $mappedType);
+                        break;
+                    case 'f':   // Formula
+                        $calculatedValue = ($this->getParentWriter()->getPreCalculateFormulas()) ?
+                                $pCell->getCalculatedValue() :
+                                $cellValue;
+                        if (is_string($calculatedValue)) {
+                            $objWriter->writeAttribute('t', 'str');
+                        }
+                        break;
+                    case 'e':   // Error
+                        $objWriter->writeAttribute('t', $mappedType);
+                }
+
+                // Write data depending on its type
+                switch (strtolower($mappedType)) {
+                    case 'inlinestr': // Inline string
+                        if (!$cellValue instanceof PHPExcel_RichText) {
+                            $objWriter->writeElement('t', PHPExcel_Shared_String::ControlCharacterPHP2OOXML(htmlspecialchars($cellValue)));
+                        } else if ($cellValue instanceof PHPExcel_RichText) {
+                            $objWriter->startElement('is');
+                            $this->getParentWriter()->getWriterPart('stringtable')->writeRichText($objWriter, $cellValue);
+                            $objWriter->endElement();
+                        }
+
+                        break;
+                    case 's':   // String
+                        if (!$cellValue instanceof PHPExcel_RichText) {
+                            if (isset($pFlippedStringTable[$cellValue])) {
+                                $objWriter->writeElement('v', $pFlippedStringTable[$cellValue]);
+                            }
+                        } else if ($cellValue instanceof PHPExcel_RichText) {
+                            $objWriter->writeElement('v', $pFlippedStringTable[$cellValue->getHashCode()]);
+                        }
+
+                        break;
+                    case 'f':   // Formula
+                        $attributes = $pCell->getFormulaAttributes();
+                        if ($attributes['t'] == 'array') {
+                            $objWriter->startElement('f');
+                            $objWriter->writeAttribute('t', 'array');
+                            $objWriter->writeAttribute('ref', $pCellAddress);
+                            $objWriter->writeAttribute('aca', '1');
+                            $objWriter->writeAttribute('ca', '1');
+                            $objWriter->text(substr($cellValue, 1));
+                            $objWriter->endElement();
+                        } else {
+                            $objWriter->writeElement('f', substr($cellValue, 1));
+                        }
+                        if ($this->getParentWriter()->getOffice2003Compatibility() === false) {
+                            if ($this->getParentWriter()->getPreCalculateFormulas()) {
+//								$calculatedValue = $pCell->getCalculatedValue();
+                                if (!is_array($calculatedValue) && substr($calculatedValue, 0, 1) != '#') {
+                                    $objWriter->writeElement('v', PHPExcel_Shared_String::FormatNumber($calculatedValue));
+                                } else {
+                                    $objWriter->writeElement('v', '0');
+                                }
+                            } else {
+                                $objWriter->writeElement('v', '0');
+                            }
+                        }
+                        break;
+                    case 'n':   // Numeric
+                        // force point as decimal separator in case current locale uses comma
+                        $objWriter->writeElement('v', str_replace(',', '.', $cellValue));
+                        break;
+                    case 'b':   // Boolean
+                        $objWriter->writeElement('v', ($cellValue ? '1' : '0'));
+                        break;
+                    case 'e':   // Error
+                        if (substr($cellValue, 0, 1) == '=') {
+                            $objWriter->writeElement('f', substr($cellValue, 1));
+                            $objWriter->writeElement('v', substr($cellValue, 1));
+                        } else {
+                            $objWriter->writeElement('v', $cellValue);
+                        }
+
+                        break;
+                }
+            }
+
+            $objWriter->endElement();
+        } else {
+            throw new PHPExcel_Writer_Exception("Invalid parameters passed.");
+        }
+    }
+
+    /**
+     * Write Drawings
+     *
+     * @param	PHPExcel_Shared_XMLWriter	$objWriter		XML Writer
+     * @param	PHPExcel_Worksheet			$pSheet			Worksheet
+     * @param	boolean						$includeCharts	Flag indicating if we should include drawing details for charts
+     * @throws	PHPExcel_Writer_Exception
+     */
+    private function _writeDrawings(PHPExcel_Shared_XMLWriter $objWriter = null, PHPExcel_Worksheet $pSheet = null, $includeCharts = FALSE) {
+        $chartCount = ($includeCharts) ? $pSheet->getChartCollection()->count() : 0;
+        // If sheet contains drawings, add the relationships
+        if (($pSheet->getDrawingCollection()->count() > 0) ||
+                ($chartCount > 0)) {
+            $objWriter->startElement('drawing');
+            $objWriter->writeAttribute('r:id', 'rId1');
+            $objWriter->endElement();
+        }
+    }
+
+    /**
+     * Write LegacyDrawing
+     *
+     * @param	PHPExcel_Shared_XMLWriter		$objWriter		XML Writer
+     * @param	PHPExcel_Worksheet				$pSheet			Worksheet
+     * @throws	PHPExcel_Writer_Exception
+     */
+    private function _writeLegacyDrawing(PHPExcel_Shared_XMLWriter $objWriter = null, PHPExcel_Worksheet $pSheet = null) {
+        // If sheet contains comments, add the relationships
+        if (count($pSheet->getComments()) > 0) {
+            $objWriter->startElement('legacyDrawing');
+            $objWriter->writeAttribute('r:id', 'rId_comments_vml1');
+            $objWriter->endElement();
+        }
+    }
+
+    /**
+     * Write LegacyDrawingHF
+     *
+     * @param	PHPExcel_Shared_XMLWriter		$objWriter		XML Writer
+     * @param	PHPExcel_Worksheet				$pSheet			Worksheet
+     * @throws	PHPExcel_Writer_Exception
+     */
+    private function _writeLegacyDrawingHF(PHPExcel_Shared_XMLWriter $objWriter = null, PHPExcel_Worksheet $pSheet = null) {
+        // If sheet contains images, add the relationships
+        if (count($pSheet->getHeaderFooter()->getImages()) > 0) {
+            $objWriter->startElement('legacyDrawingHF');
+            $objWriter->writeAttribute('r:id', 'rId_headerfooter_vml1');
+            $objWriter->endElement();
+        }
+    }
+
+}

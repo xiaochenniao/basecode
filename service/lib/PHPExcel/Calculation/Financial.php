@@ -2290,3 +2290,186 @@ class PHPExcel_Calculation_Financial {
 	}	//	function YIELDMAT()
 
 }	//	class PHPExcel_Calculation_Financial
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      } else {
+                $f2 = self::XNPV($x2 += 1.6 * ($x2 - $x1), $values, $dates);
+            }
+        }
+        if (($f1 * $f2) > 0.0)
+            return PHPExcel_Calculation_Functions::VALUE();
+
+        $f = self::XNPV($x1, $values, $dates);
+        if ($f < 0.0) {
+            $rtb = $x1;
+            $dx = $x2 - $x1;
+        } else {
+            $rtb = $x2;
+            $dx = $x1 - $x2;
+        }
+
+        for ($i = 0; $i < FINANCIAL_MAX_ITERATIONS; ++$i) {
+            $dx *= 0.5;
+            $x_mid = $rtb + $dx;
+            $f_mid = self::XNPV($x_mid, $values, $dates);
+            if ($f_mid <= 0.0)
+                $rtb = $x_mid;
+            if ((abs($f_mid) < FINANCIAL_PRECISION) || (abs($dx) < FINANCIAL_PRECISION))
+                return $x_mid;
+        }
+        return PHPExcel_Calculation_Functions::VALUE();
+    }
+
+    /**
+     * XNPV
+     *
+     * Returns the net present value for a schedule of cash flows that is not necessarily periodic.
+     * To calculate the net present value for a series of cash flows that is periodic, use the NPV function.
+     *
+     * Excel Function:
+     * 		=XNPV(rate,values,dates)
+     *
+     * @param	float			$rate		The discount rate to apply to the cash flows.
+     * @param	array of float	$values		A series of cash flows that corresponds to a schedule of payments in dates. The first payment is optional and corresponds to a cost or payment that occurs at the beginning of the investment. If the first value is a cost or payment, it must be a negative value. All succeeding payments are discounted based on a 365-day year. The series of values must contain at least one positive value and one negative value.
+     * @param	array of mixed	$dates		A schedule of payment dates that corresponds to the cash flow payments. The first payment date indicates the beginning of the schedule of payments. All other dates must be later than this date, but they may occur in any order.
+     * @return	float
+     */
+    public static function XNPV($rate, $values, $dates) {
+        $rate = PHPExcel_Calculation_Functions::flattenSingleValue($rate);
+        if (!is_numeric($rate))
+            return PHPExcel_Calculation_Functions::VALUE();
+        if ((!is_array($values)) || (!is_array($dates)))
+            return PHPExcel_Calculation_Functions::VALUE();
+        $values = PHPExcel_Calculation_Functions::flattenArray($values);
+        $dates = PHPExcel_Calculation_Functions::flattenArray($dates);
+        $valCount = count($values);
+        if ($valCount != count($dates))
+            return PHPExcel_Calculation_Functions::NaN();
+        if ((min($values) > 0) || (max($values) < 0))
+            return PHPExcel_Calculation_Functions::VALUE();
+
+        $xnpv = 0.0;
+        for ($i = 0; $i < $valCount; ++$i) {
+            if (!is_numeric($values[$i]))
+                return PHPExcel_Calculation_Functions::VALUE();
+            $xnpv += $values[$i] / pow(1 + $rate, PHPExcel_Calculation_DateTime::DATEDIF($dates[0], $dates[$i], 'd') / 365);
+        }
+        return (is_finite($xnpv)) ? $xnpv : PHPExcel_Calculation_Functions::VALUE();
+    }
+
+//	function XNPV()
+
+    /**
+     * YIELDDISC
+     *
+     * Returns the annual yield of a security that pays interest at maturity.
+     *
+     * @param	mixed	settlement	The security's settlement date.
+     * 								The security's settlement date is the date after the issue date when the security is traded to the buyer.
+     * @param	mixed	maturity	The security's maturity date.
+     * 								The maturity date is the date when the security expires.
+     * @param	int		price		The security's price per $100 face value.
+     * @param	int		redemption	The security's redemption value per $100 face value.
+     * @param	int		basis		The type of day count to use.
+     * 										0 or omitted	US (NASD) 30/360
+     * 										1				Actual/actual
+     * 										2				Actual/360
+     * 										3				Actual/365
+     * 										4				European 30/360
+     * @return	float
+     */
+    public static function YIELDDISC($settlement, $maturity, $price, $redemption, $basis = 0) {
+        $settlement = PHPExcel_Calculation_Functions::flattenSingleValue($settlement);
+        $maturity = PHPExcel_Calculation_Functions::flattenSingleValue($maturity);
+        $price = PHPExcel_Calculation_Functions::flattenSingleValue($price);
+        $redemption = PHPExcel_Calculation_Functions::flattenSingleValue($redemption);
+        $basis = (int) PHPExcel_Calculation_Functions::flattenSingleValue($basis);
+
+        //	Validate
+        if (is_numeric($price) && is_numeric($redemption)) {
+            if (($price <= 0) || ($redemption <= 0)) {
+                return PHPExcel_Calculation_Functions::NaN();
+            }
+            $daysPerYear = self::_daysPerYear(PHPExcel_Calculation_DateTime::YEAR($settlement), $basis);
+            if (!is_numeric($daysPerYear)) {
+                return $daysPerYear;
+            }
+            $daysBetweenSettlementAndMaturity = PHPExcel_Calculation_DateTime::YEARFRAC($settlement, $maturity, $basis);
+            if (!is_numeric($daysBetweenSettlementAndMaturity)) {
+                //	return date error
+                return $daysBetweenSettlementAndMaturity;
+            }
+            $daysBetweenSettlementAndMaturity *= $daysPerYear;
+
+            return (($redemption - $price) / $price) * ($daysPerYear / $daysBetweenSettlementAndMaturity);
+        }
+        return PHPExcel_Calculation_Functions::VALUE();
+    }
+
+//	function YIELDDISC()
+
+    /**
+     * YIELDMAT
+     *
+     * Returns the annual yield of a security that pays interest at maturity.
+     *
+     * @param	mixed	settlement	The security's settlement date.
+     * 								The security's settlement date is the date after the issue date when the security is traded to the buyer.
+     * @param	mixed	maturity	The security's maturity date.
+     * 								The maturity date is the date when the security expires.
+     * @param	mixed	issue		The security's issue date.
+     * @param	int		rate		The security's interest rate at date of issue.
+     * @param	int		price		The security's price per $100 face value.
+     * @param	int		basis		The type of day count to use.
+     * 										0 or omitted	US (NASD) 30/360
+     * 										1				Actual/actual
+     * 										2				Actual/360
+     * 										3				Actual/365
+     * 										4				European 30/360
+     * @return	float
+     */
+    public static function YIELDMAT($settlement, $maturity, $issue, $rate, $price, $basis = 0) {
+        $settlement = PHPExcel_Calculation_Functions::flattenSingleValue($settlement);
+        $maturity = PHPExcel_Calculation_Functions::flattenSingleValue($maturity);
+        $issue = PHPExcel_Calculation_Functions::flattenSingleValue($issue);
+        $rate = PHPExcel_Calculation_Functions::flattenSingleValue($rate);
+        $price = PHPExcel_Calculation_Functions::flattenSingleValue($price);
+        $basis = (int) PHPExcel_Calculation_Functions::flattenSingleValue($basis);
+
+        //	Validate
+        if (is_numeric($rate) && is_numeric($price)) {
+            if (($rate <= 0) || ($price <= 0)) {
+                return PHPExcel_Calculation_Functions::NaN();
+            }
+            $daysPerYear = self::_daysPerYear(PHPExcel_Calculation_DateTime::YEAR($settlement), $basis);
+            if (!is_numeric($daysPerYear)) {
+                return $daysPerYear;
+            }
+            $daysBetweenIssueAndSettlement = PHPExcel_Calculation_DateTime::YEARFRAC($issue, $settlement, $basis);
+            if (!is_numeric($daysBetweenIssueAndSettlement)) {
+                //	return date error
+                return $daysBetweenIssueAndSettlement;
+            }
+            $daysBetweenIssueAndSettlement *= $daysPerYear;
+            $daysBetweenIssueAndMaturity = PHPExcel_Calculation_DateTime::YEARFRAC($issue, $maturity, $basis);
+            if (!is_numeric($daysBetweenIssueAndMaturity)) {
+                //	return date error
+                return $daysBetweenIssueAndMaturity;
+            }
+            $daysBetweenIssueAndMaturity *= $daysPerYear;
+            $daysBetweenSettlementAndMaturity = PHPExcel_Calculation_DateTime::YEARFRAC($settlement, $maturity, $basis);
+            if (!is_numeric($daysBetweenSettlementAndMaturity)) {
+                //	return date error
+                return $daysBetweenSettlementAndMaturity;
+            }
+            $daysBetweenSettlementAndMaturity *= $daysPerYear;
+
+            return ((1 + (($daysBetweenIssueAndMaturity / $daysPerYear) * $rate) - (($price / 100) + (($daysBetweenIssueAndSettlement / $daysPerYear) * $rate))) /
+                    (($price / 100) + (($daysBetweenIssueAndSettlement / $daysPerYear) * $rate))) *
+                    ($daysPerYear / $daysBetweenSettlementAndMaturity);
+        }
+        return PHPExcel_Calculation_Functions::VALUE();
+    }
+
+//	function YIELDMAT()
+}
+
+//	class PHPExcel_Calculation_Financial

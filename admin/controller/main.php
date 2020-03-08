@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 公用主要程序  如登录 退出 后台首页
  */
-
 class main_Controller extends Controller {
 
     function indexAction() {

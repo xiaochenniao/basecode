@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -25,7 +26,6 @@
  * @version    1.8.0, 2014-03-02
  */
 
-
 /**
  * PHPExcel_Worksheet_ColumnDimension
  *
@@ -33,71 +33,70 @@
  * @package    PHPExcel_Worksheet
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Worksheet_ColumnDimension
-{
-	/**
-	 * Column index
-	 *
-	 * @var int
-	 */
-	private $_columnIndex;
+class PHPExcel_Worksheet_ColumnDimension {
 
-	/**
-	 * Column width
-	 *
-	 * When this is set to a negative value, the column width should be ignored by IWriter
-	 *
-	 * @var double
-	 */
-	private $_width			= -1;
+    /**
+     * Column index
+     *
+     * @var int
+     */
+    private $_columnIndex;
 
-	/**
-	 * Auto size?
-	 *
-	 * @var bool
-	 */
-	private $_autoSize		= false;
+    /**
+     * Column width
+     *
+     * When this is set to a negative value, the column width should be ignored by IWriter
+     *
+     * @var double
+     */
+    private $_width = -1;
 
-	/**
-	 * Visible?
-	 *
-	 * @var bool
-	 */
-	private $_visible		= true;
+    /**
+     * Auto size?
+     *
+     * @var bool
+     */
+    private $_autoSize = false;
 
-	/**
-	 * Outline level
-	 *
-	 * @var int
-	 */
-	private $_outlineLevel	= 0;
+    /**
+     * Visible?
+     *
+     * @var bool
+     */
+    private $_visible = true;
 
-	/**
-	 * Collapsed
-	 *
-	 * @var bool
-	 */
-	private $_collapsed		= false;
+    /**
+     * Outline level
+     *
+     * @var int
+     */
+    private $_outlineLevel = 0;
 
-	/**
-	 * Index to cellXf
-	 *
-	 * @var int
-	 */
-	private $_xfIndex;
+    /**
+     * Collapsed
+     *
+     * @var bool
+     */
+    private $_collapsed = false;
+
+    /**
+     * Index to cellXf
+     *
+     * @var int
+     */
+    private $_xfIndex;
 
     /**
      * Create a new PHPExcel_Worksheet_ColumnDimension
      *
      * @param string $pIndex Character column index
      */
-    public function __construct($pIndex = 'A')
-    {
-    	// Initialise values
-    	$this->_columnIndex		= $pIndex;
+    public function __construct($pIndex = 'A') {
+        // Initialise values
+        $this->_columnIndex = $pIndex;
 
-		// set default index to cellXf
-		$this->_xfIndex = 0;
+        // set default index to cellXf
+        $this->_xfIndex = 0;
     }
 
     /**
@@ -106,7 +105,7 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return string
      */
     public function getColumnIndex() {
-    	return $this->_columnIndex;
+        return $this->_columnIndex;
     }
 
     /**
@@ -116,8 +115,8 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return PHPExcel_Worksheet_ColumnDimension
      */
     public function setColumnIndex($pValue) {
-    	$this->_columnIndex = $pValue;
-    	return $this;
+        $this->_columnIndex = $pValue;
+        return $this;
     }
 
     /**
@@ -126,7 +125,7 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return double
      */
     public function getWidth() {
-    	return $this->_width;
+        return $this->_width;
     }
 
     /**
@@ -136,8 +135,8 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return PHPExcel_Worksheet_ColumnDimension
      */
     public function setWidth($pValue = -1) {
-    	$this->_width = $pValue;
-    	return $this;
+        $this->_width = $pValue;
+        return $this;
     }
 
     /**
@@ -146,7 +145,7 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return bool
      */
     public function getAutoSize() {
-    	return $this->_autoSize;
+        return $this->_autoSize;
     }
 
     /**
@@ -156,8 +155,8 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return PHPExcel_Worksheet_ColumnDimension
      */
     public function setAutoSize($pValue = false) {
-    	$this->_autoSize = $pValue;
-    	return $this;
+        $this->_autoSize = $pValue;
+        return $this;
     }
 
     /**
@@ -166,7 +165,7 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return bool
      */
     public function getVisible() {
-    	return $this->_visible;
+        return $this->_visible;
     }
 
     /**
@@ -176,8 +175,8 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return PHPExcel_Worksheet_ColumnDimension
      */
     public function setVisible($pValue = true) {
-    	$this->_visible = $pValue;
-    	return $this;
+        $this->_visible = $pValue;
+        return $this;
     }
 
     /**
@@ -186,7 +185,7 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return int
      */
     public function getOutlineLevel() {
-    	return $this->_outlineLevel;
+        return $this->_outlineLevel;
     }
 
     /**
@@ -199,12 +198,12 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return PHPExcel_Worksheet_ColumnDimension
      */
     public function setOutlineLevel($pValue) {
-    	if ($pValue < 0 || $pValue > 7) {
-    		throw new PHPExcel_Exception("Outline level must range between 0 and 7.");
-    	}
+        if ($pValue < 0 || $pValue > 7) {
+            throw new PHPExcel_Exception("Outline level must range between 0 and 7.");
+        }
 
-    	$this->_outlineLevel = $pValue;
-    	return $this;
+        $this->_outlineLevel = $pValue;
+        return $this;
     }
 
     /**
@@ -213,7 +212,7 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return bool
      */
     public function getCollapsed() {
-    	return $this->_collapsed;
+        return $this->_collapsed;
     }
 
     /**
@@ -223,44 +222,42 @@ class PHPExcel_Worksheet_ColumnDimension
      * @return PHPExcel_Worksheet_ColumnDimension
      */
     public function setCollapsed($pValue = true) {
-    	$this->_collapsed = $pValue;
-    	return $this;
+        $this->_collapsed = $pValue;
+        return $this;
     }
 
-	/**
-	 * Get index to cellXf
-	 *
-	 * @return int
-	 */
-	public function getXfIndex()
-	{
-		return $this->_xfIndex;
-	}
+    /**
+     * Get index to cellXf
+     *
+     * @return int
+     */
+    public function getXfIndex() {
+        return $this->_xfIndex;
+    }
 
-	/**
-	 * Set index to cellXf
-	 *
-	 * @param int $pValue
-	 * @return PHPExcel_Worksheet_ColumnDimension
-	 */
-	public function setXfIndex($pValue = 0)
-	{
-		$this->_xfIndex = $pValue;
-		return $this;
-	}
+    /**
+     * Set index to cellXf
+     *
+     * @param int $pValue
+     * @return PHPExcel_Worksheet_ColumnDimension
+     */
+    public function setXfIndex($pValue = 0) {
+        $this->_xfIndex = $pValue;
+        return $this;
+    }
 
-	/**
-	 * Implement PHP __clone to create a deep clone, not just a shallow copy.
-	 */
-	public function __clone() {
-		$vars = get_object_vars($this);
-		foreach ($vars as $key => $value) {
-			if (is_object($value)) {
-				$this->$key = clone $value;
-			} else {
-				$this->$key = $value;
-			}
-		}
-	}
+    /**
+     * Implement PHP __clone to create a deep clone, not just a shallow copy.
+     */
+    public function __clone() {
+        $vars = get_object_vars($this);
+        foreach ($vars as $key => $value) {
+            if (is_object($value)) {
+                $this->$key = clone $value;
+            } else {
+                $this->$key = $value;
+            }
+        }
+    }
 
 }

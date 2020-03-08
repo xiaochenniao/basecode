@@ -1,9 +1,8 @@
 <?php
 
-/*
+/**
  * 后台管理员 设置常用操作菜单
  */
-
 class diymenu_Controller extends Controller {
 
     function indexAction() {

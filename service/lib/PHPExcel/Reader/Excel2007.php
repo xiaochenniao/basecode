@@ -2067,3 +2067,594 @@ class PHPExcel_Reader_Excel2007 extends PHPExcel_Reader_Abstract implements PHPE
 		return ($value === 'true' || $value === 'TRUE');
 	}
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            r->from->row + 1));
+                                                    $objDrawing->setOffsetX(PHPExcel_Shared_Drawing::EMUToPixels($oneCellAnchor->from->colOff));
+                                                    $objDrawing->setOffsetY(PHPExcel_Shared_Drawing::EMUToPixels($oneCellAnchor->from->rowOff));
+                                                    $objDrawing->setResizeProportional(false);
+                                                    $objDrawing->setWidth(PHPExcel_Shared_Drawing::EMUToPixels(self::array_item($oneCellAnchor->ext->attributes(), "cx")));
+                                                    $objDrawing->setHeight(PHPExcel_Shared_Drawing::EMUToPixels(self::array_item($oneCellAnchor->ext->attributes(), "cy")));
+                                                    if ($xfrm) {
+                                                        $objDrawing->setRotation(PHPExcel_Shared_Drawing::angleToDegrees(self::array_item($xfrm->attributes(), "rot")));
+                                                    }
+                                                    if ($outerShdw) {
+                                                        $shadow = $objDrawing->getShadow();
+                                                        $shadow->setVisible(true);
+                                                        $shadow->setBlurRadius(PHPExcel_Shared_Drawing::EMUTopixels(self::array_item($outerShdw->attributes(), "blurRad")));
+                                                        $shadow->setDistance(PHPExcel_Shared_Drawing::EMUTopixels(self::array_item($outerShdw->attributes(), "dist")));
+                                                        $shadow->setDirection(PHPExcel_Shared_Drawing::angleToDegrees(self::array_item($outerShdw->attributes(), "dir")));
+                                                        $shadow->setAlignment((string) self::array_item($outerShdw->attributes(), "algn"));
+                                                        $shadow->getColor()->setRGB(self::array_item($outerShdw->srgbClr->attributes(), "val"));
+                                                        $shadow->setAlpha(self::array_item($outerShdw->srgbClr->alpha->attributes(), "val") / 1000);
+                                                    }
+                                                    $objDrawing->setWorksheet($docSheet);
+                                                } else {
+                                                    //	? Can charts be positioned with a oneCellAnchor ?
+                                                    $coordinates = PHPExcel_Cell::stringFromColumnIndex((string) $oneCellAnchor->from->col) . ($oneCellAnchor->from->row + 1);
+                                                    $offsetX = PHPExcel_Shared_Drawing::EMUToPixels($oneCellAnchor->from->colOff);
+                                                    $offsetY = PHPExcel_Shared_Drawing::EMUToPixels($oneCellAnchor->from->rowOff);
+                                                    $width = PHPExcel_Shared_Drawing::EMUToPixels(self::array_item($oneCellAnchor->ext->attributes(), "cx"));
+                                                    $height = PHPExcel_Shared_Drawing::EMUToPixels(self::array_item($oneCellAnchor->ext->attributes(), "cy"));
+                                                }
+                                            }
+                                        }
+                                        if ($xmlDrawing->twoCellAnchor) {
+                                            foreach ($xmlDrawing->twoCellAnchor as $twoCellAnchor) {
+                                                if ($twoCellAnchor->pic->blipFill) {
+                                                    $blip = $twoCellAnchor->pic->blipFill->children("http://schemas.openxmlformats.org/drawingml/2006/main")->blip;
+                                                    $xfrm = $twoCellAnchor->pic->spPr->children("http://schemas.openxmlformats.org/drawingml/2006/main")->xfrm;
+                                                    $outerShdw = $twoCellAnchor->pic->spPr->children("http://schemas.openxmlformats.org/drawingml/2006/main")->effectLst->outerShdw;
+                                                    $objDrawing = new PHPExcel_Worksheet_Drawing;
+                                                    $objDrawing->setName((string) self::array_item($twoCellAnchor->pic->nvPicPr->cNvPr->attributes(), "name"));
+                                                    $objDrawing->setDescription((string) self::array_item($twoCellAnchor->pic->nvPicPr->cNvPr->attributes(), "descr"));
+                                                    $objDrawing->setPath("zip://" . PHPExcel_Shared_File::realpath($pFilename) . "#" . $images[(string) self::array_item($blip->attributes("http://schemas.openxmlformats.org/officeDocument/2006/relationships"), "embed")], false);
+                                                    $objDrawing->setCoordinates(PHPExcel_Cell::stringFromColumnIndex((string) $twoCellAnchor->from->col) . ($twoCellAnchor->from->row + 1));
+                                                    $objDrawing->setOffsetX(PHPExcel_Shared_Drawing::EMUToPixels($twoCellAnchor->from->colOff));
+                                                    $objDrawing->setOffsetY(PHPExcel_Shared_Drawing::EMUToPixels($twoCellAnchor->from->rowOff));
+                                                    $objDrawing->setResizeProportional(false);
+
+                                                    $objDrawing->setWidth(PHPExcel_Shared_Drawing::EMUToPixels(self::array_item($xfrm->ext->attributes(), "cx")));
+                                                    $objDrawing->setHeight(PHPExcel_Shared_Drawing::EMUToPixels(self::array_item($xfrm->ext->attributes(), "cy")));
+
+                                                    if ($xfrm) {
+                                                        $objDrawing->setRotation(PHPExcel_Shared_Drawing::angleToDegrees(self::array_item($xfrm->attributes(), "rot")));
+                                                    }
+                                                    if ($outerShdw) {
+                                                        $shadow = $objDrawing->getShadow();
+                                                        $shadow->setVisible(true);
+                                                        $shadow->setBlurRadius(PHPExcel_Shared_Drawing::EMUTopixels(self::array_item($outerShdw->attributes(), "blurRad")));
+                                                        $shadow->setDistance(PHPExcel_Shared_Drawing::EMUTopixels(self::array_item($outerShdw->attributes(), "dist")));
+                                                        $shadow->setDirection(PHPExcel_Shared_Drawing::angleToDegrees(self::array_item($outerShdw->attributes(), "dir")));
+                                                        $shadow->setAlignment((string) self::array_item($outerShdw->attributes(), "algn"));
+                                                        $shadow->getColor()->setRGB(self::array_item($outerShdw->srgbClr->attributes(), "val"));
+                                                        $shadow->setAlpha(self::array_item($outerShdw->srgbClr->alpha->attributes(), "val") / 1000);
+                                                    }
+                                                    $objDrawing->setWorksheet($docSheet);
+                                                } elseif (($this->_includeCharts) && ($twoCellAnchor->graphicFrame)) {
+                                                    $fromCoordinate = PHPExcel_Cell::stringFromColumnIndex((string) $twoCellAnchor->from->col) . ($twoCellAnchor->from->row + 1);
+                                                    $fromOffsetX = PHPExcel_Shared_Drawing::EMUToPixels($twoCellAnchor->from->colOff);
+                                                    $fromOffsetY = PHPExcel_Shared_Drawing::EMUToPixels($twoCellAnchor->from->rowOff);
+                                                    $toCoordinate = PHPExcel_Cell::stringFromColumnIndex((string) $twoCellAnchor->to->col) . ($twoCellAnchor->to->row + 1);
+                                                    $toOffsetX = PHPExcel_Shared_Drawing::EMUToPixels($twoCellAnchor->to->colOff);
+                                                    $toOffsetY = PHPExcel_Shared_Drawing::EMUToPixels($twoCellAnchor->to->rowOff);
+                                                    $graphic = $twoCellAnchor->graphicFrame->children("http://schemas.openxmlformats.org/drawingml/2006/main")->graphic;
+                                                    $chartRef = $graphic->graphicData->children("http://schemas.openxmlformats.org/drawingml/2006/chart")->chart;
+                                                    $thisChart = (string) $chartRef->attributes("http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+
+                                                    $chartDetails[$docSheet->getTitle() . '!' . $thisChart] = array('fromCoordinate' => $fromCoordinate,
+                                                        'fromOffsetX' => $fromOffsetX,
+                                                        'fromOffsetY' => $fromOffsetY,
+                                                        'toCoordinate' => $toCoordinate,
+                                                        'toOffsetX' => $toOffsetX,
+                                                        'toOffsetY' => $toOffsetY,
+                                                        'worksheetTitle' => $docSheet->getTitle()
+                                                    );
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Loop through definedNames
+                            if ($xmlWorkbook->definedNames) {
+                                foreach ($xmlWorkbook->definedNames->definedName as $definedName) {
+                                    // Extract range
+                                    $extractedRange = (string) $definedName;
+                                    $extractedRange = preg_replace('/\'(\w+)\'\!/', '', $extractedRange);
+                                    if (($spos = strpos($extractedRange, '!')) !== false) {
+                                        $extractedRange = substr($extractedRange, 0, $spos) . str_replace('$', '', substr($extractedRange, $spos));
+                                    } else {
+                                        $extractedRange = str_replace('$', '', $extractedRange);
+                                    }
+
+                                    // Valid range?
+                                    if (stripos((string) $definedName, '#REF!') !== FALSE || $extractedRange == '') {
+                                        continue;
+                                    }
+
+                                    // Some definedNames are only applicable if we are on the same sheet...
+                                    if ((string) $definedName['localSheetId'] != '' && (string) $definedName['localSheetId'] == $sheetId) {
+                                        // Switch on type
+                                        switch ((string) $definedName['name']) {
+
+                                            case '_xlnm._FilterDatabase':
+                                                if ((string) $definedName['hidden'] !== '1') {
+                                                    $docSheet->getAutoFilter()->setRange($extractedRange);
+                                                }
+                                                break;
+
+                                            case '_xlnm.Print_Titles':
+                                                // Split $extractedRange
+                                                $extractedRange = explode(',', $extractedRange);
+
+                                                // Set print titles
+                                                foreach ($extractedRange as $range) {
+                                                    $matches = array();
+                                                    $range = str_replace('$', '', $range);
+
+                                                    // check for repeating columns, e g. 'A:A' or 'A:D'
+                                                    if (preg_match('/!?([A-Z]+)\:([A-Z]+)$/', $range, $matches)) {
+                                                        $docSheet->getPageSetup()->setColumnsToRepeatAtLeft(array($matches[1], $matches[2]));
+                                                    }
+                                                    // check for repeating rows, e.g. '1:1' or '1:5'
+                                                    elseif (preg_match('/!?(\d+)\:(\d+)$/', $range, $matches)) {
+                                                        $docSheet->getPageSetup()->setRowsToRepeatAtTop(array($matches[1], $matches[2]));
+                                                    }
+                                                }
+                                                break;
+
+                                            case '_xlnm.Print_Area':
+                                                $rangeSets = explode(',', $extractedRange);  // FIXME: what if sheetname contains comma?
+                                                $newRangeSets = array();
+                                                foreach ($rangeSets as $rangeSet) {
+                                                    $range = explode('!', $rangeSet); // FIXME: what if sheetname contains exclamation mark?
+                                                    $rangeSet = isset($range[1]) ? $range[1] : $range[0];
+                                                    if (strpos($rangeSet, ':') === FALSE) {
+                                                        $rangeSet = $rangeSet . ':' . $rangeSet;
+                                                    }
+                                                    $newRangeSets[] = str_replace('$', '', $rangeSet);
+                                                }
+                                                $docSheet->getPageSetup()->setPrintArea(implode(',', $newRangeSets));
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Next sheet id
+                            ++$sheetId;
+                        }
+
+                        // Loop through definedNames
+                        if ($xmlWorkbook->definedNames) {
+                            foreach ($xmlWorkbook->definedNames->definedName as $definedName) {
+                                // Extract range
+                                $extractedRange = (string) $definedName;
+                                $extractedRange = preg_replace('/\'(\w+)\'\!/', '', $extractedRange);
+                                if (($spos = strpos($extractedRange, '!')) !== false) {
+                                    $extractedRange = substr($extractedRange, 0, $spos) . str_replace('$', '', substr($extractedRange, $spos));
+                                } else {
+                                    $extractedRange = str_replace('$', '', $extractedRange);
+                                }
+
+                                // Valid range?
+                                if (stripos((string) $definedName, '#REF!') !== false || $extractedRange == '') {
+                                    continue;
+                                }
+
+                                // Some definedNames are only applicable if we are on the same sheet...
+                                if ((string) $definedName['localSheetId'] != '') {
+                                    // Local defined name
+                                    // Switch on type
+                                    switch ((string) $definedName['name']) {
+
+                                        case '_xlnm._FilterDatabase':
+                                        case '_xlnm.Print_Titles':
+                                        case '_xlnm.Print_Area':
+                                            break;
+
+                                        default:
+                                            if ($mapSheetId[(integer) $definedName['localSheetId']] !== null) {
+                                                $range = explode('!', (string) $definedName);
+                                                if (count($range) == 2) {
+                                                    $range[0] = str_replace("''", "'", $range[0]);
+                                                    $range[0] = str_replace("'", "", $range[0]);
+                                                    if ($worksheet = $docSheet->getParent()->getSheetByName($range[0])) {
+                                                        $extractedRange = str_replace('$', '', $range[1]);
+                                                        $scope = $docSheet->getParent()->getSheet($mapSheetId[(integer) $definedName['localSheetId']]);
+                                                        $excel->addNamedRange(new PHPExcel_NamedRange((string) $definedName['name'], $worksheet, $extractedRange, true, $scope));
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                    }
+                                } else if (!isset($definedName['localSheetId'])) {
+                                    // "Global" definedNames
+                                    $locatedSheet = null;
+                                    $extractedSheetName = '';
+                                    if (strpos((string) $definedName, '!') !== false) {
+                                        // Extract sheet name
+                                        $extractedSheetName = PHPExcel_Worksheet::extractSheetTitle((string) $definedName, true);
+                                        $extractedSheetName = $extractedSheetName[0];
+
+                                        // Locate sheet
+                                        $locatedSheet = $excel->getSheetByName($extractedSheetName);
+
+                                        // Modify range
+                                        $range = explode('!', $extractedRange);
+                                        $extractedRange = isset($range[1]) ? $range[1] : $range[0];
+                                    }
+
+                                    if ($locatedSheet !== NULL) {
+                                        $excel->addNamedRange(new PHPExcel_NamedRange((string) $definedName['name'], $locatedSheet, $extractedRange, false));
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ((!$this->_readDataOnly) || (!empty($this->_loadSheetsOnly))) {
+                        // active sheet index
+                        $activeTab = intval($xmlWorkbook->bookViews->workbookView["activeTab"]); // refers to old sheet index
+                        // keep active sheet index if sheet is still loaded, else first sheet is set as the active
+                        if (isset($mapSheetId[$activeTab]) && $mapSheetId[$activeTab] !== null) {
+                            $excel->setActiveSheetIndex($mapSheetId[$activeTab]);
+                        } else {
+                            if ($excel->getSheetCount() == 0) {
+                                $excel->createSheet();
+                            }
+                            $excel->setActiveSheetIndex(0);
+                        }
+                    }
+                    break;
+            }
+        }
+
+
+        if (!$this->_readDataOnly) {
+            $contentTypes = simplexml_load_string($this->_getFromZipArchive($zip, "[Content_Types].xml"), 'SimpleXMLElement', PHPExcel_Settings::getLibXmlLoaderOptions());
+            foreach ($contentTypes->Override as $contentType) {
+                switch ($contentType["ContentType"]) {
+                    case "application/vnd.openxmlformats-officedocument.drawingml.chart+xml":
+                        if ($this->_includeCharts) {
+                            $chartEntryRef = ltrim($contentType['PartName'], '/');
+                            $chartElements = simplexml_load_string($this->_getFromZipArchive($zip, $chartEntryRef), 'SimpleXMLElement', PHPExcel_Settings::getLibXmlLoaderOptions());
+                            $objChart = PHPExcel_Reader_Excel2007_Chart::readChart($chartElements, basename($chartEntryRef, '.xml'));
+
+//							echo 'Chart ',$chartEntryRef,'<br />';
+//							var_dump($charts[$chartEntryRef]);
+//
+                            if (isset($charts[$chartEntryRef])) {
+                                $chartPositionRef = $charts[$chartEntryRef]['sheet'] . '!' . $charts[$chartEntryRef]['id'];
+//								echo 'Position Ref ',$chartPositionRef,'<br />';
+                                if (isset($chartDetails[$chartPositionRef])) {
+//									var_dump($chartDetails[$chartPositionRef]);
+
+                                    $excel->getSheetByName($charts[$chartEntryRef]['sheet'])->addChart($objChart);
+                                    $objChart->setWorksheet($excel->getSheetByName($charts[$chartEntryRef]['sheet']));
+                                    $objChart->setTopLeftPosition($chartDetails[$chartPositionRef]['fromCoordinate'], $chartDetails[$chartPositionRef]['fromOffsetX'], $chartDetails[$chartPositionRef]['fromOffsetY']
+                                    );
+                                    $objChart->setBottomRightPosition($chartDetails[$chartPositionRef]['toCoordinate'], $chartDetails[$chartPositionRef]['toOffsetX'], $chartDetails[$chartPositionRef]['toOffsetY']
+                                    );
+                                }
+                            }
+                        }
+                }
+            }
+        }
+
+        $zip->close();
+
+        return $excel;
+    }
+
+    private static function _readColor($color, $background = FALSE) {
+        if (isset($color["rgb"])) {
+            return (string) $color["rgb"];
+        } else if (isset($color["indexed"])) {
+            return PHPExcel_Style_Color::indexedColor($color["indexed"] - 7, $background)->getARGB();
+        } else if (isset($color["theme"])) {
+            if (self::$_theme !== NULL) {
+                $returnColour = self::$_theme->getColourByIndex((int) $color["theme"]);
+                if (isset($color["tint"])) {
+                    $tintAdjust = (float) $color["tint"];
+                    $returnColour = PHPExcel_Style_Color::changeBrightness($returnColour, $tintAdjust);
+                }
+                return 'FF' . $returnColour;
+            }
+        }
+
+        if ($background) {
+            return 'FFFFFFFF';
+        }
+        return 'FF000000';
+    }
+
+    private static function _readStyle($docStyle, $style) {
+        // format code
+//		if (isset($style->numFmt)) {
+//			if (isset($style->numFmt['formatCode'])) {
+//				$docStyle->getNumberFormat()->setFormatCode((string) $style->numFmt['formatCode']);
+//			} else {
+        $docStyle->getNumberFormat()->setFormatCode($style->numFmt);
+//			}
+//		}
+        // font
+        if (isset($style->font)) {
+            $docStyle->getFont()->setName((string) $style->font->name["val"]);
+            $docStyle->getFont()->setSize((string) $style->font->sz["val"]);
+            if (isset($style->font->b)) {
+                $docStyle->getFont()->setBold(!isset($style->font->b["val"]) || self::boolean((string) $style->font->b["val"]));
+            }
+            if (isset($style->font->i)) {
+                $docStyle->getFont()->setItalic(!isset($style->font->i["val"]) || self::boolean((string) $style->font->i["val"]));
+            }
+            if (isset($style->font->strike)) {
+                $docStyle->getFont()->setStrikethrough(!isset($style->font->strike["val"]) || self::boolean((string) $style->font->strike["val"]));
+            }
+            $docStyle->getFont()->getColor()->setARGB(self::_readColor($style->font->color));
+
+            if (isset($style->font->u) && !isset($style->font->u["val"])) {
+                $docStyle->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_SINGLE);
+            } else if (isset($style->font->u) && isset($style->font->u["val"])) {
+                $docStyle->getFont()->setUnderline((string) $style->font->u["val"]);
+            }
+
+            if (isset($style->font->vertAlign) && isset($style->font->vertAlign["val"])) {
+                $vertAlign = strtolower((string) $style->font->vertAlign["val"]);
+                if ($vertAlign == 'superscript') {
+                    $docStyle->getFont()->setSuperScript(true);
+                }
+                if ($vertAlign == 'subscript') {
+                    $docStyle->getFont()->setSubScript(true);
+                }
+            }
+        }
+
+        // fill
+        if (isset($style->fill)) {
+            if ($style->fill->gradientFill) {
+                $gradientFill = $style->fill->gradientFill[0];
+                if (!empty($gradientFill["type"])) {
+                    $docStyle->getFill()->setFillType((string) $gradientFill["type"]);
+                }
+                $docStyle->getFill()->setRotation(floatval($gradientFill["degree"]));
+                $gradientFill->registerXPathNamespace("sml", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+                $docStyle->getFill()->getStartColor()->setARGB(self::_readColor(self::array_item($gradientFill->xpath("sml:stop[@position=0]"))->color));
+                $docStyle->getFill()->getEndColor()->setARGB(self::_readColor(self::array_item($gradientFill->xpath("sml:stop[@position=1]"))->color));
+            } elseif ($style->fill->patternFill) {
+                $patternType = (string) $style->fill->patternFill["patternType"] != '' ? (string) $style->fill->patternFill["patternType"] : 'solid';
+                $docStyle->getFill()->setFillType($patternType);
+                if ($style->fill->patternFill->fgColor) {
+                    $docStyle->getFill()->getStartColor()->setARGB(self::_readColor($style->fill->patternFill->fgColor, true));
+                } else {
+                    $docStyle->getFill()->getStartColor()->setARGB('FF000000');
+                }
+                if ($style->fill->patternFill->bgColor) {
+                    $docStyle->getFill()->getEndColor()->setARGB(self::_readColor($style->fill->patternFill->bgColor, true));
+                }
+            }
+        }
+
+        // border
+        if (isset($style->border)) {
+            $diagonalUp = self::boolean((string) $style->border["diagonalUp"]);
+            $diagonalDown = self::boolean((string) $style->border["diagonalDown"]);
+            if (!$diagonalUp && !$diagonalDown) {
+                $docStyle->getBorders()->setDiagonalDirection(PHPExcel_Style_Borders::DIAGONAL_NONE);
+            } elseif ($diagonalUp && !$diagonalDown) {
+                $docStyle->getBorders()->setDiagonalDirection(PHPExcel_Style_Borders::DIAGONAL_UP);
+            } elseif (!$diagonalUp && $diagonalDown) {
+                $docStyle->getBorders()->setDiagonalDirection(PHPExcel_Style_Borders::DIAGONAL_DOWN);
+            } else {
+                $docStyle->getBorders()->setDiagonalDirection(PHPExcel_Style_Borders::DIAGONAL_BOTH);
+            }
+            self::_readBorder($docStyle->getBorders()->getLeft(), $style->border->left);
+            self::_readBorder($docStyle->getBorders()->getRight(), $style->border->right);
+            self::_readBorder($docStyle->getBorders()->getTop(), $style->border->top);
+            self::_readBorder($docStyle->getBorders()->getBottom(), $style->border->bottom);
+            self::_readBorder($docStyle->getBorders()->getDiagonal(), $style->border->diagonal);
+        }
+
+        // alignment
+        if (isset($style->alignment)) {
+            $docStyle->getAlignment()->setHorizontal((string) $style->alignment["horizontal"]);
+            $docStyle->getAlignment()->setVertical((string) $style->alignment["vertical"]);
+
+            $textRotation = 0;
+            if ((int) $style->alignment["textRotation"] <= 90) {
+                $textRotation = (int) $style->alignment["textRotation"];
+            } else if ((int) $style->alignment["textRotation"] > 90) {
+                $textRotation = 90 - (int) $style->alignment["textRotation"];
+            }
+
+            $docStyle->getAlignment()->setTextRotation(intval($textRotation));
+            $docStyle->getAlignment()->setWrapText(self::boolean((string) $style->alignment["wrapText"]));
+            $docStyle->getAlignment()->setShrinkToFit(self::boolean((string) $style->alignment["shrinkToFit"]));
+            $docStyle->getAlignment()->setIndent(intval((string) $style->alignment["indent"]) > 0 ? intval((string) $style->alignment["indent"]) : 0 );
+        }
+
+        // protection
+        if (isset($style->protection)) {
+            if (isset($style->protection['locked'])) {
+                if (self::boolean((string) $style->protection['locked'])) {
+                    $docStyle->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
+                } else {
+                    $docStyle->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_UNPROTECTED);
+                }
+            }
+
+            if (isset($style->protection['hidden'])) {
+                if (self::boolean((string) $style->protection['hidden'])) {
+                    $docStyle->getProtection()->setHidden(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
+                } else {
+                    $docStyle->getProtection()->setHidden(PHPExcel_Style_Protection::PROTECTION_UNPROTECTED);
+                }
+            }
+        }
+
+        // top-level style settings
+        if (isset($style->quotePrefix)) {
+            $docStyle->setQuotePrefix($style->quotePrefix);
+        }
+    }
+
+    private static function _readBorder($docBorder, $eleBorder) {
+        if (isset($eleBorder["style"])) {
+            $docBorder->setBorderStyle((string) $eleBorder["style"]);
+        }
+        if (isset($eleBorder->color)) {
+            $docBorder->getColor()->setARGB(self::_readColor($eleBorder->color));
+        }
+    }
+
+    private function _parseRichText($is = null) {
+        $value = new PHPExcel_RichText();
+
+        if (isset($is->t)) {
+            $value->createText(PHPExcel_Shared_String::ControlCharacterOOXML2PHP((string) $is->t));
+        } else {
+            foreach ($is->r as $run) {
+                if (!isset($run->rPr)) {
+                    $objText = $value->createText(PHPExcel_Shared_String::ControlCharacterOOXML2PHP((string) $run->t));
+                } else {
+                    $objText = $value->createTextRun(PHPExcel_Shared_String::ControlCharacterOOXML2PHP((string) $run->t));
+
+                    if (isset($run->rPr->rFont["val"])) {
+                        $objText->getFont()->setName((string) $run->rPr->rFont["val"]);
+                    }
+
+                    if (isset($run->rPr->sz["val"])) {
+                        $objText->getFont()->setSize((string) $run->rPr->sz["val"]);
+                    }
+
+                    if (isset($run->rPr->color)) {
+                        $objText->getFont()->setColor(new PHPExcel_Style_Color(self::_readColor($run->rPr->color)));
+                    }
+
+                    if ((isset($run->rPr->b["val"]) && self::boolean((string) $run->rPr->b["val"])) ||
+                            (isset($run->rPr->b) && !isset($run->rPr->b["val"]))) {
+                        $objText->getFont()->setBold(TRUE);
+                    }
+
+                    if ((isset($run->rPr->i["val"]) && self::boolean((string) $run->rPr->i["val"])) ||
+                            (isset($run->rPr->i) && !isset($run->rPr->i["val"]))) {
+                        $objText->getFont()->setItalic(TRUE);
+                    }
+
+                    if (isset($run->rPr->vertAlign) && isset($run->rPr->vertAlign["val"])) {
+                        $vertAlign = strtolower((string) $run->rPr->vertAlign["val"]);
+                        if ($vertAlign == 'superscript') {
+                            $objText->getFont()->setSuperScript(TRUE);
+                        }
+                        if ($vertAlign == 'subscript') {
+                            $objText->getFont()->setSubScript(TRUE);
+                        }
+                    }
+
+                    if (isset($run->rPr->u) && !isset($run->rPr->u["val"])) {
+                        $objText->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_SINGLE);
+                    } else if (isset($run->rPr->u) && isset($run->rPr->u["val"])) {
+                        $objText->getFont()->setUnderline((string) $run->rPr->u["val"]);
+                    }
+
+                    if ((isset($run->rPr->strike["val"]) && self::boolean((string) $run->rPr->strike["val"])) ||
+                            (isset($run->rPr->strike) && !isset($run->rPr->strike["val"]))) {
+                        $objText->getFont()->setStrikethrough(TRUE);
+                    }
+                }
+            }
+        }
+
+        return $value;
+    }
+
+    private function _readRibbon($excel, $customUITarget, $zip) {
+        $baseDir = dirname($customUITarget);
+        $nameCustomUI = basename($customUITarget);
+        // get the xml file (ribbon)
+        $localRibbon = $this->_getFromZipArchive($zip, $customUITarget);
+        $customUIImagesNames = array();
+        $customUIImagesBinaries = array();
+        // something like customUI/_rels/customUI.xml.rels
+        $pathRels = $baseDir . '/_rels/' . $nameCustomUI . '.rels';
+        $dataRels = $this->_getFromZipArchive($zip, $pathRels);
+        if ($dataRels) {
+            // exists and not empty if the ribbon have some pictures (other than internal MSO)
+            $UIRels = simplexml_load_string($dataRels, 'SimpleXMLElement', PHPExcel_Settings::getLibXmlLoaderOptions());
+            if ($UIRels) {
+                // we need to save id and target to avoid parsing customUI.xml and "guess" if it's a pseudo callback who load the image
+                foreach ($UIRels->Relationship as $ele) {
+                    if ($ele["Type"] == 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image') {
+                        // an image ?
+                        $customUIImagesNames[(string) $ele['Id']] = (string) $ele['Target'];
+                        $customUIImagesBinaries[(string) $ele['Target']] = $this->_getFromZipArchive($zip, $baseDir . '/' . (string) $ele['Target']);
+                    }
+                }
+            }
+        }
+        if ($localRibbon) {
+            $excel->setRibbonXMLData($customUITarget, $localRibbon);
+            if (count($customUIImagesNames) > 0 && count($customUIImagesBinaries) > 0) {
+                $excel->setRibbonBinObjects($customUIImagesNames, $customUIImagesBinaries);
+            } else {
+                $excel->setRibbonBinObjects(NULL);
+            }
+        } else {
+            $excel->setRibbonXMLData(NULL);
+            $excel->setRibbonBinObjects(NULL);
+        }
+    }
+
+    private static function array_item($array, $key = 0) {
+        return (isset($array[$key]) ? $array[$key] : null);
+    }
+
+    private static function dir_add($base, $add) {
+        return preg_replace('~[^/]+/\.\./~', '', dirname($base) . "/$add");
+    }
+
+    private static function toCSSArray($style) {
+        $style = str_replace(array("\r", "\n"), "", $style);
+
+        $temp = explode(';', $style);
+        $style = array();
+        foreach ($temp as $item) {
+            $item = explode(':', $item);
+
+            if (strpos($item[1], 'px') !== false) {
+                $item[1] = str_replace('px', '', $item[1]);
+            }
+            if (strpos($item[1], 'pt') !== false) {
+                $item[1] = str_replace('pt', '', $item[1]);
+                $item[1] = PHPExcel_Shared_Font::fontSizeToPixels($item[1]);
+            }
+            if (strpos($item[1], 'in') !== false) {
+                $item[1] = str_replace('in', '', $item[1]);
+                $item[1] = PHPExcel_Shared_Font::inchSizeToPixels($item[1]);
+            }
+            if (strpos($item[1], 'cm') !== false) {
+                $item[1] = str_replace('cm', '', $item[1]);
+                $item[1] = PHPExcel_Shared_Font::centimeterSizeToPixels($item[1]);
+            }
+
+            $style[$item[0]] = $item[1];
+        }
+
+        return $style;
+    }
+
+    private static function boolean($value = NULL) {
+        if (is_object($value)) {
+            $value = (string) $value;
+        }
+        if (is_numeric($value)) {
+            return (bool) $value;
+        }
+        return ($value === 'true' || $value === 'TRUE');
+    }
+
+}

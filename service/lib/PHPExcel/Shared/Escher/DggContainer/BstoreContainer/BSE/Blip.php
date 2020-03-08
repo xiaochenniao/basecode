@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -32,60 +33,56 @@
  * @package    PHPExcel_Shared_Escher
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE_Blip
-{
-	/**
-	 * The parent BSE
-	 *
-	 * @var PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE
-	 */
-	private $_parent;
+class PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE_Blip {
 
-	/**
-	 * Raw image data
-	 *
-	 * @var string
-	 */
-	private $_data;
+    /**
+     * The parent BSE
+     *
+     * @var PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE
+     */
+    private $_parent;
 
-	/**
-	 * Get the raw image data
-	 *
-	 * @return string
-	 */
-	public function getData()
-	{
-		return $this->_data;
-	}
+    /**
+     * Raw image data
+     *
+     * @var string
+     */
+    private $_data;
 
-	/**
-	 * Set the raw image data
-	 *
-	 * @param string
-	 */
-	public function setData($data)
-	{
-		$this->_data = $data;
-	}
+    /**
+     * Get the raw image data
+     *
+     * @return string
+     */
+    public function getData() {
+        return $this->_data;
+    }
 
-	/**
-	 * Set parent BSE
-	 *
-	 * @param PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $parent
-	 */
-	public function setParent($parent)
-	{
-		$this->_parent = $parent;
-	}
+    /**
+     * Set the raw image data
+     *
+     * @param string
+     */
+    public function setData($data) {
+        $this->_data = $data;
+    }
 
-	/**
-	 * Get parent BSE
-	 *
-	 * @return PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $parent
-	 */
-	public function getParent()
-	{
-		return $this->_parent;
-	}
+    /**
+     * Set parent BSE
+     *
+     * @param PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $parent
+     */
+    public function setParent($parent) {
+        $this->_parent = $parent;
+    }
+
+    /**
+     * Get parent BSE
+     *
+     * @return PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $parent
+     */
+    public function getParent() {
+        return $this->_parent;
+    }
 
 }

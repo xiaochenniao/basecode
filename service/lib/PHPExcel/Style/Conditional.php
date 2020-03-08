@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel
  *
@@ -25,7 +26,6 @@
  * @version    1.8.0, 2014-03-02
  */
 
-
 /**
  * PHPExcel_Style_Conditional
  *
@@ -33,74 +33,73 @@
  * @package    PHPExcel_Style
  * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
-class PHPExcel_Style_Conditional implements PHPExcel_IComparable
-{
-	/* Condition types */
-	const CONDITION_NONE					= 'none';
-	const CONDITION_CELLIS					= 'cellIs';
-	const CONDITION_CONTAINSTEXT			= 'containsText';
-	const CONDITION_EXPRESSION 				= 'expression';
+class PHPExcel_Style_Conditional implements PHPExcel_IComparable {
+    /* Condition types */
 
-	/* Operator types */
-	const OPERATOR_NONE						= '';
-	const OPERATOR_BEGINSWITH				= 'beginsWith';
-	const OPERATOR_ENDSWITH					= 'endsWith';
-	const OPERATOR_EQUAL					= 'equal';
-	const OPERATOR_GREATERTHAN				= 'greaterThan';
-	const OPERATOR_GREATERTHANOREQUAL		= 'greaterThanOrEqual';
-	const OPERATOR_LESSTHAN					= 'lessThan';
-	const OPERATOR_LESSTHANOREQUAL			= 'lessThanOrEqual';
-	const OPERATOR_NOTEQUAL					= 'notEqual';
-	const OPERATOR_CONTAINSTEXT				= 'containsText';
-	const OPERATOR_NOTCONTAINS				= 'notContains';
-	const OPERATOR_BETWEEN					= 'between';
+    const CONDITION_NONE = 'none';
+    const CONDITION_CELLIS = 'cellIs';
+    const CONDITION_CONTAINSTEXT = 'containsText';
+    const CONDITION_EXPRESSION = 'expression';
 
-	/**
-	 * Condition type
-	 *
-	 * @var int
-	 */
-	private $_conditionType;
+    /* Operator types */
+    const OPERATOR_NONE = '';
+    const OPERATOR_BEGINSWITH = 'beginsWith';
+    const OPERATOR_ENDSWITH = 'endsWith';
+    const OPERATOR_EQUAL = 'equal';
+    const OPERATOR_GREATERTHAN = 'greaterThan';
+    const OPERATOR_GREATERTHANOREQUAL = 'greaterThanOrEqual';
+    const OPERATOR_LESSTHAN = 'lessThan';
+    const OPERATOR_LESSTHANOREQUAL = 'lessThanOrEqual';
+    const OPERATOR_NOTEQUAL = 'notEqual';
+    const OPERATOR_CONTAINSTEXT = 'containsText';
+    const OPERATOR_NOTCONTAINS = 'notContains';
+    const OPERATOR_BETWEEN = 'between';
 
-	/**
-	 * Operator type
-	 *
-	 * @var int
-	 */
-	private $_operatorType;
+    /**
+     * Condition type
+     *
+     * @var int
+     */
+    private $_conditionType;
 
-	/**
-	 * Text
-	 *
-	 * @var string
-	 */
-	private $_text;
+    /**
+     * Operator type
+     *
+     * @var int
+     */
+    private $_operatorType;
 
-	/**
-	 * Condition
-	 *
-	 * @var string[]
-	 */
-	private $_condition = array();
+    /**
+     * Text
+     *
+     * @var string
+     */
+    private $_text;
 
-	/**
-	 * Style
-	 *
-	 * @var PHPExcel_Style
-	 */
-	private $_style;
+    /**
+     * Condition
+     *
+     * @var string[]
+     */
+    private $_condition = array();
+
+    /**
+     * Style
+     *
+     * @var PHPExcel_Style
+     */
+    private $_style;
 
     /**
      * Create a new PHPExcel_Style_Conditional
      */
-    public function __construct()
-    {
-    	// Initialise values
-    	$this->_conditionType		= PHPExcel_Style_Conditional::CONDITION_NONE;
-    	$this->_operatorType		= PHPExcel_Style_Conditional::OPERATOR_NONE;
-    	$this->_text    			= null;
-    	$this->_condition			= array();
-    	$this->_style				= new PHPExcel_Style(FALSE, TRUE);
+    public function __construct() {
+        // Initialise values
+        $this->_conditionType = PHPExcel_Style_Conditional::CONDITION_NONE;
+        $this->_operatorType = PHPExcel_Style_Conditional::OPERATOR_NONE;
+        $this->_text = null;
+        $this->_condition = array();
+        $this->_style = new PHPExcel_Style(FALSE, TRUE);
     }
 
     /**
@@ -109,7 +108,7 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return string
      */
     public function getConditionType() {
-    	return $this->_conditionType;
+        return $this->_conditionType;
     }
 
     /**
@@ -119,8 +118,8 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style_Conditional
      */
     public function setConditionType($pValue = PHPExcel_Style_Conditional::CONDITION_NONE) {
-    	$this->_conditionType = $pValue;
-    	return $this;
+        $this->_conditionType = $pValue;
+        return $this;
     }
 
     /**
@@ -129,7 +128,7 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return string
      */
     public function getOperatorType() {
-    	return $this->_operatorType;
+        return $this->_operatorType;
     }
 
     /**
@@ -139,8 +138,8 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style_Conditional
      */
     public function setOperatorType($pValue = PHPExcel_Style_Conditional::OPERATOR_NONE) {
-    	$this->_operatorType = $pValue;
-    	return $this;
+        $this->_operatorType = $pValue;
+        return $this;
     }
 
     /**
@@ -159,8 +158,8 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style_Conditional
      */
     public function setText($value = null) {
-           $this->_text = $value;
-           return $this;
+        $this->_text = $value;
+        return $this;
     }
 
     /**
@@ -170,11 +169,11 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return string
      */
     public function getCondition() {
-    	if (isset($this->_condition[0])) {
-    		return $this->_condition[0];
-    	}
+        if (isset($this->_condition[0])) {
+            return $this->_condition[0];
+        }
 
-    	return '';
+        return '';
     }
 
     /**
@@ -185,10 +184,10 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style_Conditional
      */
     public function setCondition($pValue = '') {
-    	if (!is_array($pValue))
-    		$pValue = array($pValue);
+        if (!is_array($pValue))
+            $pValue = array($pValue);
 
-    	return $this->setConditions($pValue);
+        return $this->setConditions($pValue);
     }
 
     /**
@@ -197,7 +196,7 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return string[]
      */
     public function getConditions() {
-    	return $this->_condition;
+        return $this->_condition;
     }
 
     /**
@@ -207,11 +206,11 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style_Conditional
      */
     public function setConditions($pValue) {
-    	if (!is_array($pValue))
-    		$pValue = array($pValue);
+        if (!is_array($pValue))
+            $pValue = array($pValue);
 
-    	$this->_condition = $pValue;
-    	return $this;
+        $this->_condition = $pValue;
+        return $this;
     }
 
     /**
@@ -221,8 +220,8 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style_Conditional
      */
     public function addCondition($pValue = '') {
-    	$this->_condition[] = $pValue;
-    	return $this;
+        $this->_condition[] = $pValue;
+        return $this;
     }
 
     /**
@@ -231,7 +230,7 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style
      */
     public function getStyle() {
-    	return $this->_style;
+        return $this->_style;
     }
 
     /**
@@ -242,36 +241,37 @@ class PHPExcel_Style_Conditional implements PHPExcel_IComparable
      * @return PHPExcel_Style_Conditional
      */
     public function setStyle(PHPExcel_Style $pValue = null) {
-   		$this->_style = $pValue;
-   		return $this;
+        $this->_style = $pValue;
+        return $this;
     }
 
-	/**
-	 * Get hash code
-	 *
-	 * @return string	Hash code
-	 */
-	public function getHashCode() {
-    	return md5(
-    		  $this->_conditionType
-    		. $this->_operatorType
-    		. implode(';', $this->_condition)
-    		. $this->_style->getHashCode()
-    		. __CLASS__
-    	);
+    /**
+     * Get hash code
+     *
+     * @return string	Hash code
+     */
+    public function getHashCode() {
+        return md5(
+                $this->_conditionType
+                . $this->_operatorType
+                . implode(';', $this->_condition)
+                . $this->_style->getHashCode()
+                . __CLASS__
+        );
     }
 
-	/**
-	 * Implement PHP __clone to create a deep clone, not just a shallow copy.
-	 */
-	public function __clone() {
-		$vars = get_object_vars($this);
-		foreach ($vars as $key => $value) {
-			if (is_object($value)) {
-				$this->$key = clone $value;
-			} else {
-				$this->$key = $value;
-			}
-		}
-	}
+    /**
+     * Implement PHP __clone to create a deep clone, not just a shallow copy.
+     */
+    public function __clone() {
+        $vars = get_object_vars($this);
+        foreach ($vars as $key => $value) {
+            if (is_object($value)) {
+                $this->$key = clone $value;
+            } else {
+                $this->$key = $value;
+            }
+        }
+    }
+
 }
