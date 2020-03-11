@@ -19,12 +19,16 @@ if (!defined('ATTACHMENT'))
     define('ATTACHMENT', 'attachment');
 if (!defined('UPLOAD_DIR'))
     define('UPLOAD_DIR', DATA_DIR . DIRECTORY_SEPARATOR . 'attachment');
+if (!defined('TASK_DIR'))
+    define('TASK_DIR', SWOOLE_DIR . DIRECTORY_SEPARATOR . 'task');
 //
 spl_autoload_register('_autoload');
 
 function _autoload($name) {
     if (in_array($name, array('db', 'cache', 'session', 'acl', 'tree', 'mem', 'getopt', 'except', 'debug'))) {
         $file_name = CORE_DIR . DIRECTORY_SEPARATOR . $name . '.php';
+    } else if (strstr($name, 'task_')) {
+        $file_name = TASK_DIR . DIRECTORY_SEPARATOR . $name . '.php';
     } else {
         $file_name = SERVICE_DIR . DIRECTORY_SEPARATOR . $name . '.php';
     }

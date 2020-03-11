@@ -12,8 +12,13 @@ class ws_test_Controller extends base_Controller {
     }
 
     function testAction() {
+        $task_client = new task_client();
+        $task_client->connect();
+        $task_client->send(['name' => 'task_test']);
+        $task_client->close();
         v_display();
     }
 
 }
+
 ?>
