@@ -129,7 +129,7 @@ class db implements db_api {
     protected static $_tables = array();
     protected static $_auto_close = false;
 
-    protected static function _steupTable($table_name) {
+    protected static function _steupTable($table_name, $master = true) {
         $_table_name = $table_name;
         if (strpos($table_name, '.')) {
             list($_schema, $_table_name) = explode('.', $table_name, 2);
@@ -154,15 +154,27 @@ class db implements db_api {
                 throw new except('config db.source [' . $table_name . '] not found.');
             }
             //$dsn['pass'] = keyt::mydecrypt($dsn['pass']);
+            //主从判断
+            $is_slave = config::get('slave.is_slave');
+            if($is_slave && !$master){
+                $slave_hosts = config::get('slave.host');
+                if(is_string($slave_hosts)){
+                    $slave_host_arr = explode(',', $slave_hosts);
+                    $slave_host = $slave_host_arr[array_rand($slave_host_arr, 1)];
+                    $dsn['host'] = $slave_host;
+                }
+            }
+            
             self::$_tables[$table_name] = $table_config;
             self::$_tables[$table_name]['_db_'] = new mysqli_conn($dsn, self::$_timeout);
+            
         }
         self::$_primary = self::$_tables[$table_name]['pk'];
     }
 
-    protected static function _setupDb($table_name) {
+    protected static function _setupDb($table_name, $master = true) {
         if (empty(self::$_tables[$table_name]['_db_'])) {
-            self::_steupTable($table_name);
+            self::_steupTable($table_name, $master = true);
         }
         self::$_db = self::$_tables[$table_name]['_db_'];
     }
@@ -198,14 +210,14 @@ class db implements db_api {
     }
 
     public static function queryAll($sql, $table_name = '*') {
-        self::_setupDb($table_name);
+        self::_setupDb($table_name, false);
         $result = self::$_db->queryAll($sql);
         self::close($table_name);
         return $result;
     }
 
     public static function queryOne($sql, $table_name = '*') {
-        self::_setupDb($table_name);
+        self::_setupDb($table_name, false);
         $result = self::$_db->queryOne($sql);
         self::close($table_name);
         return $result;
@@ -235,7 +247,7 @@ class db implements db_api {
     }
 
     public static function getOneForFields($table_name, $field_names, $where = null, array $args = array(), $order = array()) {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         $sql = 'SELECT ' . $field_names . ' FROM ' . self::$_table_name;
         $sql .= self::_where($where, $args);
         if ($order == 'rand()') {
@@ -254,7 +266,7 @@ class db implements db_api {
     }
 
     public static function getWhereForFields($table_name, $field_names, $where, array $args = array(), $order = array(), $page_size = 0, $page = 0, $groupby = '') {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         $sql = 'SELECT ' . $field_names . ' FROM ' . self::$_table_name;
         $sql .= self::_where($where, $args);
         $sql .= $groupby ? " GROUP BY " . $groupby : '';
@@ -274,7 +286,7 @@ class db implements db_api {
 
     public static function getUnion($table_names, $field_names, $where, array $args = array(), $order = array(), $page_size = 0, $page = 0, $groupby = '') {
         $table_name = $table_names[0];
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         $sql = 'SELECT ' . $field_names . ' FROM ' . self::$_table_name . ' as a LEFT JOIN ' . $table_names[1] . ' as b ON ' . $table_names[2];
         $sql .= self::_where($where, $args);
         $sql .= $groupby ? " GROUP BY " . $groupby : '';
@@ -293,7 +305,7 @@ class db implements db_api {
     }
 
     public static function getAllForFields($table_name, $field_names, $order = array(), $page_size = 0, $page = 0, $groupby = '') {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         $sql = 'SELECT ' . $field_names . ' FROM ' . self::$_table_name;
         $sql .= $groupby ? " GROUP BY " . $groupby : '';
         $sql .= self::_order($order);
@@ -302,34 +314,34 @@ class db implements db_api {
     }
 
     public static function getByPk($table_name, $id) {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         return self::getOne($table_name, self::_whereByPk(array($id)));
     }
 
     public static function getByPkForFields($table_name, $field_names, $id) {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         return self::getOneForFields($table_name, $field_names, self::_whereByPk(array($id)));
     }
 
     public static function getByPksForFields($table_name, $field_names, array $ids, $order = array(), $page_size = 0, $page = 0) {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         return self::getWhereForFields($table_name, $field_names, self::_whereByPk($ids), $args = array(), $order, $page_size, $page);
     }
 
     public static function getByPks($table_name, array $ids, $order = array(), $page_size = 0, $page = 0) {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         return self::getWhere($table_name, self::_whereByPk($ids), $args = array(), $order, $page_size, $page);
     }
 
     public static function countAll($table_name, $groupby = '') {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         $sql = 'SELECT COUNT(' . ($groupby ? "DISTINCT " . $groupby : "*") . ') AS count FROM ' . self::$_table_name;
         $record = self::queryOne($sql, $table_name);
         return (int) $record['count'];
     }
 
     public static function countWhere($table_name, $where, array $args = array(), $groupby = '') {
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         $sql = 'SELECT COUNT(' . ($groupby ? "DISTINCT " . $groupby : "*") . ') AS count FROM ' . self::$_table_name;
         $sql .= self::_where($where, $args);
         $record = self::queryOne($sql, $table_name);
@@ -338,7 +350,7 @@ class db implements db_api {
 
     public static function countUnion($table_names, $where, array $args = array(), $groupby = '') {
         $table_name = $table_names[0];
-        self::_steupTable($table_name);
+        self::_steupTable($table_name, false);
         $sql = 'SELECT COUNT(' . ($groupby ? "DISTINCT " . $groupby : "*") . ') AS count FROM ' . self::$_table_name . ' as a LEFT JOIN ' . $table_names[1] . ' as b ON ' . $table_names[2];
         ;
         $sql .= self::_where($where, $args);
