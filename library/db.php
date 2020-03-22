@@ -135,6 +135,7 @@ class db implements db_api {
             list($_schema, $_table_name) = explode('.', $table_name, 2);
         }
         self::$_table_name = '`' . $_table_name . '`';
+        //主从性能上有问题
         if (!isset(self::$_tables[$table_name])) {
             $tables = config::get('db.tables', array());
             // print_r($tables);exit;
@@ -156,25 +157,64 @@ class db implements db_api {
             //$dsn['pass'] = keyt::mydecrypt($dsn['pass']);
             //主从判断
             $is_slave = config::get('slave.is_slave');
-            if($is_slave && !$master){
+            if ($is_slave && !$master) {
                 $slave_hosts = config::get('slave.host');
-                if(is_string($slave_hosts)){
+                if (is_string($slave_hosts)) {
                     $slave_host_arr = explode(',', $slave_hosts);
                     $slave_host = $slave_host_arr[array_rand($slave_host_arr, 1)];
                     $dsn['host'] = $slave_host;
                 }
             }
-            
+
             self::$_tables[$table_name] = $table_config;
+            self::$_tables[$table_name]['master'] = $master === false ? 0 : 1;
+
             self::$_tables[$table_name]['_db_'] = new mysqli_conn($dsn, self::$_timeout);
-            
+        } else {
+            //主从开启才生效
+            $is_slave = config::get('slave.is_slave');
+            $master_tmp = $master === false ? 0 : 1;
+            if (($master_tmp !== self::$_tables[$table_name]['master']) && $is_slave) {
+
+                $tables = config::get('db.tables', array());
+                // print_r($tables);exit;
+                $table_config = null;
+                foreach ($tables as $table => $val) {
+                    if (preg_match("/^" . $table . "$/i", $table_name)) {
+                        $table_config = $val;
+                        break;
+                    }
+                }
+                if ($table_config === null) {
+                    throw new except('config db.tables [' . $table_name . '] not found.');
+                }
+                $dsn = config::get('db.sources.' . $table_config['source']);
+                // print_r($dsn);exit;
+                if (!$dsn) {
+                    throw new except('config db.source [' . $table_name . '] not found.');
+                }
+
+                $slave_hosts = config::get('slave.host');
+                if (is_string($slave_hosts) && !$master) {
+                    $slave_host_arr = explode(',', $slave_hosts);
+                    $slave_host = $slave_host_arr[array_rand($slave_host_arr, 1)];
+                    $dsn['host'] = $slave_host;
+                }
+                self::$_tables[$table_name]['_db_'] = new mysqli_conn($dsn, self::$_timeout);
+                //print_r(self::$_tables);
+            }
         }
         self::$_primary = self::$_tables[$table_name]['pk'];
     }
 
     protected static function _setupDb($table_name, $master = true) {
         if (empty(self::$_tables[$table_name]['_db_'])) {
-            self::_steupTable($table_name, $master = true);
+            self::_steupTable($table_name, $master);
+        } else {
+            $master_tmp = $master === false ? 0 : 1;
+            if ($master_tmp !== self::$_tables[$table_name]['master']) {
+                self::_steupTable($table_name, $master);
+            }
         }
         self::$_db = self::$_tables[$table_name]['_db_'];
     }
@@ -400,6 +440,7 @@ class db implements db_api {
             $set[] = "`$col` = '" . addslashes((string) $val) . "'";
         }
         $sql = 'UPDATE ' . self::$_table_name . ' SET ' . implode(', ', $set) . self::_where($where, $args);
+        
         $result = self::execute($sql, $table_name);
         return $result;
     }
